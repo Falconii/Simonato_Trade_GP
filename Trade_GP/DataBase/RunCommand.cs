@@ -66,9 +66,9 @@ namespace Trade_GP.DataBase
             }
             else if (Local.ToUpper() == "1004")
             {
-                Banco = "BANCO: DB_1004 LOCAL";
+                Banco = "BANCO: DB_1004 LOCAL V2";
                 connectionString = String.Format("Server={0}; Port={1}; User Id={2}; Password={3}; Database={4}; CommandTimeout={5};",
-                                                 "localhost", 5433, "postgres", "123456", "db_1004", 5000);
+                                                 "localhost", 5432, "postgres", "123456", "db_1004", 5000);
             }
             else if (Local.ToUpper() == "PRODUCAO")
             {
