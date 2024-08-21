@@ -15,6 +15,8 @@ namespace Trade_GP.Util
     public static class ImportacaoAsync
     {
 
+        /* mamamamam */
+
         public static NfeCabTrade Cabecalho = new NfeCabTrade();
 
         public static List<NfeDetTrade> lsMoviDet = new List<NfeDetTrade>();
