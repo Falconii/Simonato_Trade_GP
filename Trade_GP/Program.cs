@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using Trade_GP.DataBase;
 
@@ -18,7 +15,7 @@ namespace Trade_GP
             {
                 if (args.Length == 0)
                 {
-                    RunCommand.SetarBanco("SERVIDOR");
+                    RunCommand.SetarBanco("default");
                 }
                 else
                 {

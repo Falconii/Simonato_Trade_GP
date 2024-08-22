@@ -497,7 +497,7 @@ namespace Trade_GP
                 Page = 200;
             }
 
-            await ImportacaoAsync.leArquivoCervejaria(progress, FileName, Path + @"\" + FileName,Page,cbCPFO.SelectedIndex == 0 ? "S" : "N");
+            await ImportacaoAsync.leArquivoCervejaria(progress, FileName, Path + @"\" + FileName,Page,cbCPFO.SelectedIndex == 0 ? "TODAS" : "5405");
 
         }
 

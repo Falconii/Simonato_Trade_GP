@@ -38,7 +38,6 @@ namespace Trade_GP
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
             this.label5 = new System.Windows.Forms.Label();
             this.panel2 = new System.Windows.Forms.Panel();
-            this.btValidarCliente = new System.Windows.Forms.Button();
             this.btCancelar = new System.Windows.Forms.Button();
             this.lbPage = new System.Windows.Forms.Label();
             this.cbPage = new System.Windows.Forms.ComboBox();
@@ -143,7 +142,6 @@ namespace Trade_GP
             // panel2
             // 
             this.panel2.BackColor = System.Drawing.SystemColors.AppWorkspace;
-            this.panel2.Controls.Add(this.btValidarCliente);
             this.panel2.Controls.Add(this.btCancelar);
             this.panel2.Controls.Add(this.lbPage);
             this.panel2.Controls.Add(this.cbPage);
@@ -157,17 +155,6 @@ namespace Trade_GP
             this.panel2.Name = "panel2";
             this.panel2.Size = new System.Drawing.Size(652, 134);
             this.panel2.TabIndex = 39;
-            // 
-            // btValidarCliente
-            // 
-            this.btValidarCliente.Location = new System.Drawing.Point(267, 87);
-            this.btValidarCliente.Margin = new System.Windows.Forms.Padding(4);
-            this.btValidarCliente.Name = "btValidarCliente";
-            this.btValidarCliente.Size = new System.Drawing.Size(112, 28);
-            this.btValidarCliente.TabIndex = 24;
-            this.btValidarCliente.Text = "Validar Cliente";
-            this.btValidarCliente.UseVisualStyleBackColor = true;
-            this.btValidarCliente.Click += new System.EventHandler(this.btValidarCliente_Click);
             // 
             // btCancelar
             // 
@@ -207,7 +194,7 @@ namespace Trade_GP
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(385, 37);
+            this.label3.Location = new System.Drawing.Point(265, 35);
             this.label3.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(114, 17);
@@ -219,12 +206,12 @@ namespace Trade_GP
             this.cbCPFO.FormattingEnabled = true;
             this.cbCPFO.ItemHeight = 16;
             this.cbCPFO.Items.AddRange(new object[] {
-            "SIM",
-            "NÃO"});
-            this.cbCPFO.Location = new System.Drawing.Point(527, 32);
+            "TODOS MOV. MENOS 5405",
+            "SOMENTE SAIDAS 5405"});
+            this.cbCPFO.Location = new System.Drawing.Point(387, 32);
             this.cbCPFO.Margin = new System.Windows.Forms.Padding(4);
             this.cbCPFO.Name = "cbCPFO";
-            this.cbCPFO.Size = new System.Drawing.Size(96, 24);
+            this.cbCPFO.Size = new System.Drawing.Size(236, 24);
             this.cbCPFO.TabIndex = 4;
             // 
             // BtImportar
@@ -414,6 +401,5 @@ namespace Trade_GP
         private System.Windows.Forms.Button btExcel;
         private System.Windows.Forms.Label lbTituloErros;
         private System.Windows.Forms.DataGridView dtGridErros;
-        private System.Windows.Forms.Button btValidarCliente;
     }
 }

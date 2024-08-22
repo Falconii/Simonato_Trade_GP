@@ -1,6 +1,9 @@
 ﻿using Npgsql;
 using Trade_GP.Util;
 using System;
+using System.IO;
+using Newtonsoft.Json;
+using System.Windows.Forms;
 
 /*
  * Local
@@ -32,9 +35,32 @@ namespace Trade_GP.DataBase
         public static String connectionString;
 
 
-        public static void SetarBanco(string Local)
+
+        public static void SetarBanco(string config)
         {
-            if (Local.ToUpper() == "LOCAL")
+
+            string curDir = Path.GetDirectoryName(System.AppDomain.CurrentDomain.BaseDirectory.ToString());
+
+            Conexao conexao = new Conexao();
+
+            try
+            {
+                StreamReader r = new StreamReader($"{curDir}//{config}.json");
+                string jsonString = r.ReadToEnd();
+                conexao = JsonConvert.DeserializeObject<Conexao>(jsonString);
+                Banco = conexao.conexaodb.app_text;
+                connectionString = String.Format("Server={0}; Port={1}; User Id={2}; Password={3}; Database={4}; CommandTimeout={5};",
+                                                conexao.conexaodb.string_conection.Server, conexao.conexaodb.string_conection.Port, conexao.conexaodb.string_conection.UserId, conexao.conexaodb.string_conection.Password, conexao.conexaodb.string_conection.Database, conexao.conexaodb.string_conection.CommandTimeout);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Erro:/n{ex.Message}", "Atenção!", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+
+        }
+               
+
+           /* if (Local.ToUpper() == "LOCAL")
             {
                 Banco = "BANCO: DB_TRADE_GP LOCAL";
                 connectionString = String.Format("Server={0}; Port={1}; User Id={2}; Password={3}; Database={4}; CommandTimeout={5};",
@@ -91,8 +117,8 @@ namespace Trade_GP.DataBase
             else
             {
                 throw new ArgumentException("Parâmetro Local inválido.");
-            }
-        }
+            }*/
+       
 
         public static void CreateCommand(string queryString)
         {

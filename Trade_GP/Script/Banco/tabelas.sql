@@ -138,6 +138,16 @@ GO
 CREATE INDEX indice_calculo_saldo
 	ON public.nfe_det_trade USING btree (id_grupo int4_ops, cod_emp text_ops, local text_ops, dt_ref date_ops, status bpchar_ops, id_operacao bpchar_ops)
 GO
+CREATE INDEX indice_sai_dev
+	ON public.nfe_det_trade USING btree (id_grupo int4_ops, id_operacao bpchar_ops, id_saida int4_ops, nro_linha_saida int4_ops)
+GO
+CREATE INDEX indice_dev_saida
+	ON public.nfe_det_trade USING btree (id_grupo int4_ops, cod_emp text_ops, local text_ops, cfop bpchar_ops, id_operacao bpchar_ops, nro_doc text_ops, material text_ops)
+GO
+CREATE INDEX indice_dev_entrada
+	ON public.nfe_det_trade USING btree (id_grupo int4_ops, cod_emp text_ops, local text_ops, id_operacao bpchar_ops, dt_ref date_ops)
+GO
+
 
 
 DROP TABLE IF EXISTS nfe_cab_trade;
@@ -292,6 +302,8 @@ WITHOUT OIDS
 TABLESPACE "Producao"
 GO
 
+
+
 DROP TABLE IF EXISTS nfe_det_trade_val;
 CREATE TABLE public.nfe_det_trade_val  ( 
     id_grupo                        int4 NOT NULL,
@@ -313,7 +325,7 @@ CREATE TABLE public.nfe_det_trade_val  (
 	PRIMARY KEY(id_grupo,id,nro_linha,id_planilha_entrada,nro_linha_entrada)
 )
 WITHOUT OIDS 
-TABLESPACE "Poducao"
+TABLESPACE "Producao"
 GO
 
 DROP TABLE IF EXISTS cont_cab_proc;
@@ -370,7 +382,7 @@ CREATE TABLE public.controle_s  (
 	PRIMARY KEY(id_grupo,id_fechamento,cod_emp,local,material)
 )
 WITHOUT OIDS 
-TABLESPACE "Producao 13"
+TABLESPACE "Producao"
 GO
 
 DROP TABLE IF EXISTS saldo_inicial;
@@ -381,6 +393,18 @@ CREATE TABLE public.saldo_inicial  (
 	material       char(15) NOT NULL,
 	saldo	       numeric(15,4) NOT NULL ,
     status         char(1) NOT NULL,
+	PRIMARY KEY(id_grupo,cod_emp,local,material)
+)
+WITHOUT OIDS 
+TABLESPACE "Producao"
+GO
+
+DROP TABLE IF EXISTS resumo_5405;
+CREATE TABLE public.resumo_5405  ( 
+    id_grupo       int4 NOT NULL,
+    cod_emp        varchar(6) NOT NULL, 
+    local          varchar(6) NOT NULL,
+	material       char(15) NOT NULL,
 	PRIMARY KEY(id_grupo,cod_emp,local,material)
 )
 WITHOUT OIDS 
