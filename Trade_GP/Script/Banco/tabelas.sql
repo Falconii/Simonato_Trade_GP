@@ -175,6 +175,7 @@ CREATE TABLE public.nfe_cab_trade  (
 	status            	int4 NULL,
 	ultima            	int4 NULL,
 	layout              char(1) NOT NULL DEFAULT  'S',
+    resumo_5405         char(1) NOT NULL DEFAULT  'N'
 	PRIMARY KEY(id_grupo,id)
 )
 WITHOUT OIDS 
@@ -410,3 +411,5 @@ CREATE TABLE public.resumo_5405  (
 WITHOUT OIDS 
 TABLESPACE "Producao"
 GO
+
+

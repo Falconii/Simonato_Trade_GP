@@ -325,23 +325,58 @@ namespace Trade_GP
 
                 NfeCabTrade result = dao.SeekByPlanilhaV2(UsuarioSistema.Id_Grupo,FileName);
 
-                if (result != null || ErroPlanilhaOpen)
+                string EntradaSaida  = getTipoEntradaSaida(FileName);
+
+                //? "5405"
+                if (cbCPFO.SelectedIndex == 0)
                 {
-
-                    if (result != null) ImportacaoAsync.StaticLsErrosImportacao.Add(new ErrosImportacao("W", FileName, "", "", "", 0, "Arquivo Duplicado -CABEÇALHO!"));
-
+                    if (EntradaSaida != "S")
+                    {
+                        ImportacaoAsync.StaticLsErrosImportacao.Add(new ErrosImportacao("W", FileName, "", "", "", 0, "Arquivo Não Compativel Com A Opção"));
+                    }
+                    else
+                    {
+                        if (ErroPlanilhaOpen)
+                        {
+                            ImportacaoAsync.StaticLsErrosImportacao.Add(new ErrosImportacao("W", FileName, "", "", "", 0, "Planilha Aberta Por Outra Aplicação"));
+                        }
+                        if (result != null)
+                        {
+                            ImportacaoAsync.StaticLsErrosImportacao.Add(new ErrosImportacao("W", FileName, "", "", "", 0, "Arquivo Duplicado -CABEÇALHO!"));
+                        }
+                    }
+                } else
+                {
+                    if (ErroPlanilhaOpen)
+                    {
+                        ImportacaoAsync.StaticLsErrosImportacao.Add(new ErrosImportacao("W", FileName, "", "", "", 0, "Planilha Aberta Por Outra Aplicação"));
+                    }
+                    if (result != null && result.resumo_5405 != "S")
+                    {
+                        ImportacaoAsync.StaticLsErrosImportacao.Add(new ErrosImportacao("W", FileName, "", "", "", 0, "Processar Primeiro CFOP 5404"));
+                    }
                 }
-                else
+
+                if (ImportacaoAsync.StaticLsErrosImportacao.Count == 0)
                 {
+                    if (result == null)
+                    {
 
-                    ImportacaoAsync.Cabecalho.Zerar();
+                        ImportacaoAsync.Cabecalho.Zerar();
 
-                    ImportacaoAsync.Cabecalho.Arquivo = FileName;
+                        ImportacaoAsync.Cabecalho.Arquivo = FileName;
 
+                        if (cbCPFO.SelectedIndex == 0)
+                        {
+                            ImportacaoAsync.Cabecalho.resumo_5405 = "S";
+                        }
+
+                    } else
+                    {
+                        ImportacaoAsync.Cabecalho = result;
+                    }
                     await ProcessaPlanilha(Path, FileName);
-
                 }
-                               
                 if (ImportacaoAsync.StaticLsErrosImportacao.Count > 0)
                 {
                     await Task.Run(async delegate
@@ -497,7 +532,7 @@ namespace Trade_GP
                 Page = 200;
             }
 
-            await ImportacaoAsync.leArquivoCervejaria(progress, FileName, Path + @"\" + FileName,Page,cbCPFO.SelectedIndex == 0 ? "TODAS" : "5405");
+            await ImportacaoAsync.leArquivoCervejaria(progress, FileName, Path + @"\" + FileName,Page,cbCPFO.SelectedIndex == 0 ?  "5405" : "TODAS");
 
         }
 
@@ -815,5 +850,21 @@ namespace Trade_GP
         {
 
         }
+
+        private string getTipoEntradaSaida(string arquivo)
+        {
+            string retorno = "";
+
+            if (arquivo.Contains("-E_")){
+                retorno = "E";
+            }
+
+            if (arquivo.Contains("-S_")){
+                retorno = "S";
+            }
+
+            return retorno;
+        }
+
     }
 }

@@ -13,7 +13,7 @@ namespace Trade_GP.Dao.postgre
     {
         public NfeCabTrade Insert(NfeCabTrade obj)
         {
-            String StringInsert = $" INSERT INTO NFE_CAB_TRADE(id_grupo,arquivo, qtd, vlr_contabil, bas_icms, vlr_icms, bas_pis, vlr_pis, bas_cof, vlr_cof, bas_ipi, vlr_ipi, bas_icms_st, vlr_icms_st, nro_linha, usuarioinclusao, usuarioatualizacao, data_criacao, data_fechamento, status, ultima, layout) VALUES ( " +
+            String StringInsert = $" INSERT INTO NFE_CAB_TRADE(id_grupo,arquivo, qtd, vlr_contabil, bas_icms, vlr_icms, bas_pis, vlr_pis, bas_cof, vlr_cof, bas_ipi, vlr_ipi, bas_icms_st, vlr_icms_st, nro_linha, usuarioinclusao, usuarioatualizacao, data_criacao, data_fechamento, status, ultima, layout, resumo_5405) VALUES ( " +
             $"  {obj.Id_Grupo}    " +
             $",'{obj.Arquivo}'   " +
             $",{obj.Qtd.DoubleParseDb()     }  " +
@@ -36,6 +36,7 @@ namespace Trade_GP.Dao.postgre
             StringInsert += $", {obj.Status}" +
             $", 0 " +
             $", '{obj.Layout}' " +
+            $", '{obj.resumo_5405}' " +
             $" )  RETURNING ID ";
 
             Console.WriteLine($"Insert NFE_CAB_TRADE: {StringInsert}");
@@ -116,7 +117,8 @@ namespace Trade_GP.Dao.postgre
             $"   ,USUARIOATUALIZACAO               = {obj.UsuarioAtualizacao}   ";
             StringUpdate += obj.DataCriacao == null ? ", DATA_CRIACAO    = null " : $", DATA_CRIACAO    = '{obj.DataCriacao.ToString("yyyy-MM-dd hh:mm:ss")}' ";
             StringUpdate += obj.DataFechamento == null ? ", DATA_FECHAMENTO = null " : $", DATA_FECHAMENTO = '{obj.DataFechamento?.ToString("yyyy-MM-dd hh:mm:ss")}' ";
-            StringUpdate += $", STATUS             =  {obj.Status} " +
+            StringUpdate += $", STATUS             =  {obj.Status} ";
+            StringUpdate += $", resumo_5405        =  '{obj.resumo_5405}' " +
             $" WHERE ID_GRUPO = {obj.Id_Grupo} AND ID = '{obj.Id}' ";
 
             Console.WriteLine(StringUpdate);
@@ -331,13 +333,12 @@ namespace Trade_GP.Dao.postgre
             {
                 obj.DataFechamento = null;
             }
-
             obj.Status = Convert.ToInt32(objDataReader["Status"]);
+            obj.resumo_5405 = objDataReader["RESUMO_5405"].ToString();
             return obj;
         }
         private NfeCabTrade PopulaNfeCabPobre(NpgsqlDataReader objDataReader)
         {
-
             var obj = new NfeCabTrade();
             obj.Id = Convert.ToInt32(objDataReader["id"].ToString());
             obj.Arquivo = objDataReader["arquivo"].ToString();
@@ -365,13 +366,12 @@ namespace Trade_GP.Dao.postgre
             {
                 obj.DataFechamento = null;
             }
-
             obj.Status = Convert.ToInt32(objDataReader["Status"]);
+            obj.resumo_5405 = objDataReader["resumo_5405"].ToString();
             return obj;
         }
         private Nfe_CabE_Qry_01 PopulaNfeCabEQry01(NpgsqlDataReader objDataReader)
         {
-
             var obj = new Nfe_CabE_Qry_01();
             obj.Id_Grupo = Convert.ToInt32(objDataReader["id_grupo"].ToString());
             obj.Id = Convert.ToInt32(objDataReader["id"].ToString());

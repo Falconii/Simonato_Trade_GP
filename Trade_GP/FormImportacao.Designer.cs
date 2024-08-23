@@ -206,12 +206,12 @@ namespace Trade_GP
             this.cbCPFO.FormattingEnabled = true;
             this.cbCPFO.ItemHeight = 16;
             this.cbCPFO.Items.AddRange(new object[] {
-            "TODOS MOV. MENOS 5405",
-            "SOMENTE SAIDAS 5405"});
+            "SOMENTE SAIDAS 5405",
+            "TODOS MOV. MENOS 5405"});
             this.cbCPFO.Location = new System.Drawing.Point(387, 32);
             this.cbCPFO.Margin = new System.Windows.Forms.Padding(4);
             this.cbCPFO.Name = "cbCPFO";
-            this.cbCPFO.Size = new System.Drawing.Size(236, 24);
+            this.cbCPFO.Size = new System.Drawing.Size(240, 24);
             this.cbCPFO.TabIndex = 4;
             // 
             // BtImportar

@@ -138,18 +138,20 @@ namespace Trade_GP.Util
 
                                 if (ContadorLinhas == 1)
                                 {
-                                    daoNfeCabTrade daoCabec = new daoNfeCabTrade();
+                                    if (Cabecalho.Id == 0) {
+                                        daoNfeCabTrade daoCabec = new daoNfeCabTrade();
 
-                                    NfeCabTrade Cabec = daoCabec.Insert(Cabecalho);
+                                        NfeCabTrade Cabec = daoCabec.Insert(Cabecalho);
 
-                                    if (Cabec == null)
-                                    {
-                                        ImportacaoAsync.StaticLsErrosImportacao.Add(new ErrosImportacao("E", fileName, $"{ContadorLinhas}", "cod_emp-local", "", 0, $"Cabeçalho {cod_emp} {local} Não Incluido!"));
+                                        if (Cabec == null)
+                                        {
+                                            ImportacaoAsync.StaticLsErrosImportacao.Add(new ErrosImportacao("E", fileName, $"{ContadorLinhas}", "cod_emp-local", "", 0, $"Cabeçalho {cod_emp} {local} Não Incluido!"));
 
-                                        break;
+                                            break;
+                                        }
+
+                                        Cabecalho.Id = Cabec.Id;
                                     }
-
-                                    Cabecalho.Id = Cabec.Id;
                                 }
                             }
 
@@ -166,6 +168,20 @@ namespace Trade_GP.Util
                             populalsMoviDet(fields, fileName, ContadorLinhas);
                             populalsMoviDets(fields, fileName, ContadorLinhas, lsMoviDets);
 
+                            if () {
+
+                                daoResumo5405 daoresumo = new daoResumo5405();
+                                Resumo_5405 resumo      = new Resumo_5405()
+                                {
+                                    id_grupo = 1,
+                                    cod_emp = lsMoviDet[lsMoviDet.Count - 1].Cod_Emp,
+                                    local = lsMoviDet[lsMoviDet.Count - 1].Cod_Emp,
+                                    material = lsMoviDet[lsMoviDet.Count - 1].Material
+                                };
+
+                                daoresumo.Update(resumo);
+
+                            }
                         }
 
                         if (lsMoviDet.Count() == Page)
@@ -800,7 +816,19 @@ namespace Trade_GP.Util
 
             if (filtroCfop == "TODAS")
             {
-                retorno = (FiltroCFOPTodas.Contains(cfop.Substring(0,1)));
+                if (cfop.Substring(0,4) == "5405")
+                {
+                    retorno = false;
+                } else
+                {
+                    retorno = (FiltroCFOPTodas.Contains(cfop.Substring(0, 1)));
+                }
+
+            }
+
+            if (filtroCfop == "5405")
+            {
+                retorno = (cfop.Substring(0, 4) == "5405");
 
             }
 

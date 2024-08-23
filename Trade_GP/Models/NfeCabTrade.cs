@@ -26,8 +26,9 @@ namespace Trade_GP.Models
         public Nullable<DateTime> DataFechamento { get; set; }
         public int Status { get; set; }
         public string  Layout { get; set; }
+        public string  resumo_5405 { get; set; }
 
-        public NfeCabTrade(int id_Grupo, int id, string arquivo, double qtd, double vlr_Contabil, double bas_Icms, double vlr_Icms, double bas_Pis, double vlr_Pis, double bas_Cof, double vlr_Cof, double bas_Ipi, double vlr_Ipi, double bas_Icms_st, double vlr_Icms_st, int nroLinha, int usuarioInclusao, int usuarioAtualizacao, DateTime dataCriacao, DateTime? dataFechamento, int status, string layout)
+        public NfeCabTrade(int id_Grupo, int id, string arquivo, double qtd, double vlr_Contabil, double bas_Icms, double vlr_Icms, double bas_Pis, double vlr_Pis, double bas_Cof, double vlr_Cof, double bas_Ipi, double vlr_Ipi, double bas_Icms_st, double vlr_Icms_st, int nroLinha, int usuarioInclusao, int usuarioAtualizacao, DateTime dataCriacao, DateTime? dataFechamento, int status, string layout, string resumo_5405)
         {
             Id_Grupo = id_Grupo;
             Id = id;
@@ -51,6 +52,7 @@ namespace Trade_GP.Models
             DataFechamento = dataFechamento;
             Status = status;
             Layout = layout;
+            resumo_5405 = resumo_5405;
         }
 
         public NfeCabTrade()
@@ -86,6 +88,7 @@ namespace Trade_GP.Models
                0=>Em Aberto
                1=>Encerrado Com Sucesso
             */
+            resumo_5405 = "N";
     }
     }
 }
