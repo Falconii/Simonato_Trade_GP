@@ -36,6 +36,8 @@ namespace Trade_GP.Util
         public static string FiltroCFOPTodas = "1#2#3#5#6#7";
         public static string FiltroCFOP5405     = "5405";
 
+        public static List<string> materiais = new List<string>();
+
 
         /*
         public static List<string> cnpjsFabricas = new List<string> {
@@ -70,6 +72,8 @@ namespace Trade_GP.Util
             string cod_emp = "";
 
             string local = "";
+
+            Boolean loadMaterais = false;
 
             await Task.Run(async () =>
             {
@@ -114,8 +118,27 @@ namespace Trade_GP.Util
                         }
                         else
                         {
-
                             fields[1] = Regex.Replace(fields[1], "[A-Za-z]", "0");
+
+
+                            if (!loadMaterais)
+                            {
+
+                                daoResumo5405 daoMaterais = new daoResumo5405();
+
+                                materiais = daoMaterais.getAll(1, fields[0], fields[1]);
+
+                                loadMaterais = true;
+
+                            }
+
+                            if (filtroCfop == "TODAS" && materiais.Count() == 0)
+                            {
+                                ImportacaoAsync.StaticLsErrosImportacao.Add(new ErrosImportacao("E", fileName,"", "", "",0,"Para Esta Operação Preciso Do Resumo De Materais!"));
+
+                                break;
+                            }
+
 
                             if (cod_emp != fields[0] || local != fields[1])
                             {
@@ -155,7 +178,7 @@ namespace Trade_GP.Util
                                 }
                             }
 
-                            if (!(ItsOK(fields[12], filtroCfop))){
+                            if (!(ItsOK(fields[12], filtroCfop))) {
 
                                 ContadorLinhas++;
 
@@ -163,19 +186,36 @@ namespace Trade_GP.Util
 
                             }
 
+                            if (filtroCfop == "TODAS")
+                            {
+                                if (fields[15].Trim() == "")
+                                {
+                                    Console.WriteLine("Em Branco");
+                                }
+
+                                var achou = materiais.FirstOrDefault(material => material.Trim() == fields[15].Trim());
+
+                                if (achou == null)
+                                {
+                                    ContadorLinhas++;
+
+                                    continue;
+                                }
+                            }
+
                             NfeDetTrade Det = new NfeDetTrade(); // Lembre-se de inicializá-lo conforme necessário
 
                             populalsMoviDet(fields, fileName, ContadorLinhas);
                             populalsMoviDets(fields, fileName, ContadorLinhas, lsMoviDets);
 
-                            if () {
+                            if (filtroCfop == "5405") {
 
                                 daoResumo5405 daoresumo = new daoResumo5405();
                                 Resumo_5405 resumo      = new Resumo_5405()
                                 {
                                     id_grupo = 1,
                                     cod_emp = lsMoviDet[lsMoviDet.Count - 1].Cod_Emp,
-                                    local = lsMoviDet[lsMoviDet.Count - 1].Cod_Emp,
+                                    local = lsMoviDet[lsMoviDet.Count - 1].Local,
                                     material = lsMoviDet[lsMoviDet.Count - 1].Material
                                 };
 

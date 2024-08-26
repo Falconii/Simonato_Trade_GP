@@ -1,5 +1,6 @@
 ﻿using Npgsql;
 using System;
+using System.Collections.Generic;
 using System.Windows.Forms;
 using Trade_GP.Models;
 using Trade_GP.Util;
@@ -74,7 +75,8 @@ namespace Trade_GP.Dao.postgre
                 try
                 {
                     obj = this.Insert(obj);
-                } catch(Exception ex)
+                }
+                catch (Exception ex)
                 {
                     obj = null;
                 }
@@ -118,6 +120,10 @@ namespace Trade_GP.Dao.postgre
 
                             obj = PopulaResumo(objDataReader);
                         }
+                        else
+                        {
+                            obj = null;
+                        }
 
                     }
                     catch (Exception ex)
@@ -133,7 +139,6 @@ namespace Trade_GP.Dao.postgre
 
             return obj;
         }
-      
 
         private Resumo_5405 PopulaResumo(NpgsqlDataReader objDataReader)
         {
@@ -148,5 +153,76 @@ namespace Trade_GP.Dao.postgre
 
             return obj;
         }
+
+        public List<string> getAll(int id_grupo, string cod_emp, string local)
+        {
+
+            List<string> lista = new List<string>();
+
+            string strStringConexao = DataBase.RunCommand.connectionString;
+
+            string strSelect = SqlGrid( id_grupo,  cod_emp,  local);
+
+            Console.WriteLine(strSelect);
+
+            using (var objConexao = new NpgsqlConnection(strStringConexao))
+            {
+                using (var objCommand = new NpgsqlCommand(strSelect, objConexao))
+                {
+                    try
+                    {
+                        objConexao.Open();
+
+                        var objDataReader = objCommand.ExecuteReader();
+
+                        if (objDataReader.HasRows)
+                        {
+
+                            while (objDataReader.Read())
+                            {
+
+                                string mat = objDataReader["material"].ToString();
+
+                                lista.Add(mat);
+
+                            }
+                        }
+
+                    }
+                    catch (Exception ex)
+                    {
+                        throw new Exception(ex.Message);
+                    }
+                    finally
+                    {
+                        objConexao.Close();
+                    }
+                }
+            }
+
+            return lista;
+        }
+
+        public string SqlGrid(int id_grupo, string cod_emp, string local)
+        {
+            string Where = "";
+
+            string OrderBy = "";
+
+            string strSelect = "select  material from resumo_5405 ";
+
+            Where = $"WHERE  id_grupo = {id_grupo} and cod_emp = '{cod_emp}' and local = '{local}'  ";
+
+
+            //Adiciona ORDER BY
+
+            OrderBy = $"ORDER BY MATERIAL";
+
+            strSelect += $" {Where} {OrderBy} ";
+
+            return strSelect;
+
+        }
     }
+
 }

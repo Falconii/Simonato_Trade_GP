@@ -42,19 +42,10 @@ namespace Trade_GP
 
         private void FormImportacao_FormClosed(object sender, FormClosedEventArgs e)
         {
-           menu.Enabled = true;
+            menu.Enabled = true;
         }
 
-        class Arquivos
-        {
-            public int Item { get; set; }
-            public String Pasta { get; set; }
-            public String Nome { get; set; }
-            public DateTime Data { get; set; }
-            public String Tamanho { get; set; }
-            public String Obs { get; set; }
 
-        }
 
         private void FormImportacao_Load(object sender, EventArgs e)
         {
@@ -108,7 +99,7 @@ namespace Trade_GP
             {
                 foreach (FileInfo info in fileInformation)
                 {
-                    if (info.Extension.ToUpper() != ".TXT"  || info.Length == 0)
+                    if (info.Extension.ToUpper() != ".TXT" || info.Length == 0)
                     {
                         continue;
                     }
@@ -124,7 +115,23 @@ namespace Trade_GP
                     };
                     list.Add(obj);
                 }
+
+                var totais = Soma_EntSai(fileInformation);
+
+                if (totais.Saida > 0 && totais.Entrada == 0)
+                {
+                    cbCPFO.SelectedIndex = 0;
+                }
+                if (totais.Saida == 0 && totais.Entrada > 0)
+                {
+                    cbCPFO.SelectedIndex = 1;
+                }
+                if (totais.Saida > 0 && totais.Entrada > 0)
+                {
+                    cbCPFO.SelectedIndex = 1;
+                }
             }
+
             var bindingList = new BindingList<Arquivos>(list);
             var source = new BindingSource(bindingList, null);
             dataGridView1.DataSource = source;
@@ -153,7 +160,7 @@ namespace Trade_GP
             dtGridErros.Columns[01].Width = 200;
             dtGridErros.Columns[01].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight;
             dtGridErros.Columns[02].HeaderText = "N° Pagina";
-            dtGridErros.Columns[02].Width =120;
+            dtGridErros.Columns[02].Width = 120;
             dtGridErros.Columns[02].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleLeft;
             dtGridErros.Columns[03].HeaderText = "Campo";
             dtGridErros.Columns[03].Width = 150;
@@ -247,7 +254,7 @@ namespace Trade_GP
             Cancelar = false;
             cbLayOut.SelectedIndex = 0;
             cbCPFO.SelectedIndex = 0;
-            cbPage.SelectedIndex   = 1;
+            cbPage.SelectedIndex = 1;
             if (tbFolder.Text.Trim() == "")
             {
                 tbFolder.Text = UsuarioSistema.Usuario.Pasta.Trim();
@@ -259,7 +266,7 @@ namespace Trade_GP
             DuranteProcessamento();
 
             Boolean ErroPlanilhaOpen = false;
-                      
+
 
             string Path = $"{tbFolder.Text}\\";
 
@@ -323,9 +330,9 @@ namespace Trade_GP
 
                 daoNfeCabTrade dao = new daoNfeCabTrade();
 
-                NfeCabTrade result = dao.SeekByPlanilhaV2(UsuarioSistema.Id_Grupo,FileName);
+                NfeCabTrade result = dao.SeekByPlanilhaV2(UsuarioSistema.Id_Grupo, FileName);
 
-                string EntradaSaida  = getTipoEntradaSaida(FileName);
+                string EntradaSaida = getTipoEntradaSaida(FileName);
 
                 //? "5405"
                 if (cbCPFO.SelectedIndex == 0)
@@ -345,7 +352,8 @@ namespace Trade_GP
                             ImportacaoAsync.StaticLsErrosImportacao.Add(new ErrosImportacao("W", FileName, "", "", "", 0, "Arquivo Duplicado -CABEÇALHO!"));
                         }
                     }
-                } else
+                }
+                else
                 {
                     if (ErroPlanilhaOpen)
                     {
@@ -371,7 +379,8 @@ namespace Trade_GP
                             ImportacaoAsync.Cabecalho.resumo_5405 = "S";
                         }
 
-                    } else
+                    }
+                    else
                     {
                         ImportacaoAsync.Cabecalho = result;
                     }
@@ -386,7 +395,7 @@ namespace Trade_GP
 
                     LoadDbGridErros(ImportacaoAsync.StaticLsErrosImportacao, false);
                 }
-                
+
                 ImportacaoAsync.lsMoviDet.Clear();
 
                 Boolean TemWarming = false;
@@ -401,7 +410,7 @@ namespace Trade_GP
                     }
                 }
 
-               
+
                 if ((ImportacaoAsync.StaticLsErrosImportacao.Count > 0) || TemWarming)
                 {
 
@@ -443,7 +452,7 @@ namespace Trade_GP
 
                         }
                     }
-                
+
                 }
                 else
                 {
@@ -473,7 +482,7 @@ namespace Trade_GP
                 ImportacaoAsync.StaticLsErrosImportacao.Clear();
 
                 CopiaArquivo(FullName, PathDestino, FileName);
-                
+
 
                 if (Cancelar)
                 {
@@ -532,7 +541,7 @@ namespace Trade_GP
                 Page = 200;
             }
 
-            await ImportacaoAsync.leArquivoCervejaria(progress, FileName, Path + @"\" + FileName,Page,cbCPFO.SelectedIndex == 0 ?  "5405" : "TODAS");
+            await ImportacaoAsync.leArquivoCervejaria(progress, FileName, Path + @"\" + FileName, Page, cbCPFO.SelectedIndex == 0 ? "5405" : "TODAS");
 
         }
 
@@ -718,7 +727,7 @@ namespace Trade_GP
                 Cancelar = true;
 
                 List<ErrosImportacao> Erros = new List<ErrosImportacao>();
-                Erros.Add(new ErrosImportacao("W","ATENÇÃO!", "", "", "", 0, "Cancelamento Solcitado!"));
+                Erros.Add(new ErrosImportacao("W", "ATENÇÃO!", "", "", "", 0, "Cancelamento Solcitado!"));
                 LoadDbGridErros(Erros, false);
 
                 btCancelar.Enabled = false;
@@ -726,7 +735,7 @@ namespace Trade_GP
             }
             else
             {
-               Cancelar = false;
+                Cancelar = false;
             }
 
         }
@@ -798,10 +807,10 @@ namespace Trade_GP
                     ErroPlanilhaOpen = true;
                 }
 
- 
+
                 await ProcessaCliente(Path, FileName);
 
-               
+
                 if (ImportacaoAsync.StaticLsErrosImportacao.Count > 0)
                 {
                     await Task.Run(async delegate
@@ -855,16 +864,57 @@ namespace Trade_GP
         {
             string retorno = "";
 
-            if (arquivo.Contains("-E_")){
+            if (arquivo.Contains("-E_"))
+            {
                 retorno = "E";
             }
 
-            if (arquivo.Contains("-S_")){
+            if (arquivo.Contains("-S_"))
+            {
                 retorno = "S";
             }
 
             return retorno;
         }
 
+
+
+        private TotalSaiEnt Soma_EntSai(FileInfo[] fileInformation)
+        {
+            TotalSaiEnt Retorno = new TotalSaiEnt();
+
+            Retorno.Entrada = 0;
+            Retorno.Saida = 0;
+
+            foreach (FileInfo info in fileInformation)
+            {
+                if (getTipoEntradaSaida(info.Name) == "S")
+                {
+                    Retorno.Saida++;
+                }
+                else
+                {
+                    Retorno.Entrada++;
+                }
+            }
+            return Retorno;
+        }
+
+        class Arquivos
+        {
+            public int Item { get; set; }
+            public String Pasta { get; set; }
+            public String Nome { get; set; }
+            public DateTime Data { get; set; }
+            public String Tamanho { get; set; }
+            public String Obs { get; set; }
+
+        }
+
+        class TotalSaiEnt
+        {
+            public int Entrada { get; set; }
+            public int Saida { get; set; }
+        }
     }
 }
