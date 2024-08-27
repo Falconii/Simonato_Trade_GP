@@ -143,6 +143,12 @@
     <Compile Include="Extensoes\IntExtension.cs" />
     <Compile Include="Extensoes\LongExtension.cs" />
     <Compile Include="Extensoes\StringExtension.cs" />
+    <Compile Include="FormImplantacaoSaldo.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormImplantacaoSaldo.Designer.cs">
+      <DependentUpon>FormImplantacaoSaldo.cs</DependentUpon>
+    </Compile>
     <Compile Include="FormSaldosLote.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -285,6 +291,9 @@
     <Compile Include="Util\Periodo.cs" />
     <Compile Include="Util\UsuarioSistema.cs" />
     <Compile Include="Util\Validacoes.cs" />
+    <EmbeddedResource Include="FormImplantacaoSaldo.resx">
+      <DependentUpon>FormImplantacaoSaldo.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="FormSaldosLote.resx">
       <DependentUpon>FormSaldosLote.cs</DependentUpon>
     </EmbeddedResource>
@@ -361,6 +370,7 @@
     <WCFMetadata Include="Connected Services\" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Script\Apoio\implantacao de saldo 1004 0001.sql" />
     <Content Include="Script\reavaliar\calculo_saldov2.sql" />
     <Content Include="Script\reavaliar\nova devolucao.sql" />
     <Content Include="Script\Apoio\relatorio saida x ent x vlr economico.sql" />

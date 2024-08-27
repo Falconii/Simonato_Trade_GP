@@ -127,6 +127,7 @@ CREATE TABLE public.Nfe_Det_Trade  (
             qtd_dev numeric(15,4) NOT NULL ,
             id_saida  int4 NOT NULL,
             nro_linha_saida  int4 NOT NULL,
+            saldo_inicial numeric(15,4) NOT NULL ,
  	PRIMARY KEY(id_grupo,id_planilha,nro_linha)
 )
 WITHOUT OIDS 
@@ -378,9 +379,12 @@ CREATE TABLE public.controle_s  (
     id_fechamento   int4 NOT NULL,    
     cod_emp         varchar(6) NOT NULL, 
     local           varchar(6) NOT NULL,
-    material         varchar(15) NOT NULL,
+    material        varchar(15) NOT NULL,
+    id_e            int4 NOT NULL,
+    nro_linha_e     int4 NOT NULL,
 	qtd_e   	    numeric(15,4) NULL,
-	PRIMARY KEY(id_grupo,id_fechamento,cod_emp,local,material)
+    qtd_s   	    numeric(15,4) NULL,
+	PRIMARY KEY(id_grupo,id_fechamento,cod_emp,local,material,id_e,nro_linha_e)
 )
 WITHOUT OIDS 
 TABLESPACE "Producao"
@@ -388,12 +392,13 @@ GO
 
 DROP TABLE IF EXISTS saldo_inicial;
 CREATE TABLE public.saldo_inicial  ( 
-    id_grupo       int4 NOT NULL,
-    cod_emp        varchar(6) NOT NULL, 
-    local          varchar(6) NOT NULL,
-	material       char(15) NOT NULL,
-	saldo	       numeric(15,4) NOT NULL ,
-    status         char(1) NOT NULL,
+    id_grupo         int4 NOT NULL,
+    cod_emp          varchar(6) NOT NULL, 
+    local            varchar(6) NOT NULL,
+	material         char(15) NOT NULL,
+	saldo_inicial    numeric(15,4) NOT NULL ,
+    saldo_implantado numeric(15,4) NOT NULL ,
+    status           char(1) NOT NULL,
 	PRIMARY KEY(id_grupo,cod_emp,local,material)
 )
 WITHOUT OIDS 

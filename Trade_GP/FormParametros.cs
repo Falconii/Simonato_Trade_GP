@@ -10,8 +10,12 @@ namespace Trade_GP
     public partial class FormParametros : Form
     {
         public List<ParamLocal> Parametros = new List<ParamLocal>();
-        public FormParametros()
+
+        public Boolean Saldos = false;
+        public FormParametros( Boolean saldos = false)
         {
+            this.Saldos = saldos;
+
             InitializeComponent();
         }
 
@@ -30,6 +34,10 @@ namespace Trade_GP
             cbEmpresas.SelectedIndex = 0;
             tvLocais.Nodes.Clear();
             tvPeriodo.Nodes.Clear();
+            if (this.Saldos)
+            {
+                tvPeriodo.Visible = false;
+            }
         }
 
         private void LoadPeriodo()
@@ -202,7 +210,7 @@ namespace Trade_GP
 
         private void btOK_Click(object sender, EventArgs e)
         {
-            if ( (ContadorLocais() == 0) || (ContadorPeriodos() == 0))
+            if ( (ContadorLocais() == 0))
             {
                string mensagem = "";
 
@@ -211,7 +219,7 @@ namespace Trade_GP
                     mensagem += "Verifique Os Locais";
                 }
 
-                if (ContadorPeriodos() == 0)
+                if ((ContadorPeriodos() == 0))
                 {
                     mensagem = mensagem + (ContadorLocais() == 0 ? " E " : "") + "Verifique Os Períodos";
                 }

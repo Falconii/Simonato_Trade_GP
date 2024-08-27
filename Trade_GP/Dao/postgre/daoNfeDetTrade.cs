@@ -1,11 +1,8 @@
 ﻿using Npgsql;
-using Trade_GP.Extensoes;
-using Trade_GP.Models;
-using Trade_GP.Util;
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Trade_GP.Models;
 
 namespace Trade_GP.Dao.postgre
 {

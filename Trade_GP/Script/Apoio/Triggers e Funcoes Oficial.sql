@@ -100,12 +100,12 @@ LANGUAGE 'plpgsql'
 go
 
 
+drop function seek_entrada_saldo;
 CREATE OR REPLACE FUNCTION "public"."seek_entrada_saldo" (
 in  _id_grupo     int4,
 in  _cod_empresa  text,
 in  _local        text,
 in  _material     text,
-in  _data         date,
 in  _saldo_s      numeric(15,4),
 in  _id_fechamento int4,
 out _saldo_f      numeric(15,4)
@@ -120,25 +120,26 @@ _saldo_e numeric(15,4);
 _qtd     numeric(15,4);
 _last    date;
 _hoje    date;
+_data    date;
 
 BEGIN
 
     _saldo_f := _saldo_s;
     _qtd     := 0;
     _hoje    := CURRENT_DATE;
-    //_data    := Date '2023-01-01';
+    _data    := Date '2017-02-28';
     //_last    := _hoje  - interval '4 years 11 months';
     //Processando as entradas
     FOR entrada in  
        SELECT *
        FROM NFE_DET_TRADE ENT
-       WHERE  ENT.id_grupo = _id_grupo and ENT.cod_emp = _cod_empresa and ENT.local = _local and ENT.material = _material and ( (ENT.id_operacao = 'E' AND ENT.cof_vlr > 0 AND ENT.saldo > 0)) and ( ENT.dt_ref <= _data)
+       WHERE  ENT.id_grupo = _id_grupo and ENT.cod_emp = _cod_empresa and ENT.local = _local and ENT.material = _material and (ENT.id_operacao = 'E' OR ENT.id_operacao = 'e') and (ENT.saldo > 0) and ( ENT.dt_ref <= _data)
        ORDER BY ENT.cod_emp,ENT.local,ENT.material,ENT.id_operacao,ENT.dt_ref desc
     LOOP     
            
-           RAISE NOTICE 'ENTRADA.cod_empresa % ENTRADA.local % ENTRADA.material % ENTRADA.dtlanc % ENTRADA.qtd % ENTRADA.saldo % ENTRADA.status %', entrada.cod_empresa,entrada.local,entrada.material,entrada.dtlanc,entrada.qtd, entrada.saldo, entrada.status;
+           //RAISE NOTICE 'ENTRADA.cod_empresa % ENTRADA.local % ENTRADA.material % ENTRADA.dtlanc % ENTRADA.qtd % ENTRADA.saldo % ENTRADA.status %', entrada.cod_empresa,entrada.local,entrada.material,entrada.dtlanc,entrada.qtd, entrada.saldo, entrada.status;
 
-           RAISE NOTICE '_id_grupo % _id_s  % _nro_linha_s % _cod_empresa % _local % _material  % _data  % _saldo_s % ', _id_grupo,_id_s,_nro_linha_s,_cod_empresa,_local,_material,_data,_saldo_s;
+           // NOTICE '_id_grupo % _id_s  % _nro_linha_s % _cod_empresa % _local % _material  % _data  % _saldo_s % ', _id_grupo,_id_fechamento,_cod_empresa,_local,_material,_data,_saldo_s;
 
            _saldo_e := entrada.saldo;
 
@@ -164,11 +165,11 @@ BEGIN
            _saldo_f := _saldo_s;
 
           //Atualiza nota e
-
+          //é feito atraves da trigger do controle_s
           //update nfe_det_trade set saldo = _saldo_e where id_grupo = entrada.id_grupo and id_planilha = entrada.id_planilha and nro_linha = entrada.nro_linha;
           
           
-          INSERT INTO controle_s(id_grupo,id_fechamento,id_s, nro_linha_s, id_e, nro_linha_e, qtd_s, qtd_e) 	VALUES(_id_grupo,_id_fechamento,_id_s, _nro_linha_s,entrada.id_planilha , entrada.nro_linha, _saldo_f, _qtd);
+          INSERT INTO controle_s(id_grupo,id_fechamento,cod_emp,local,material,id_e, nro_linha_e, qtd_e ,qtd_s) VALUES(_id_grupo,_id_fechamento,_cod_empresa, _local,_material, entrada.id_planilha , entrada.nro_linha, _qtd ,_saldo_f);
           
 
           IF (_saldo_f = 0) THEN
@@ -327,8 +328,8 @@ select * from calculo_saldo(1,'1004','0004','04/2017',1);
 */
 
 
-CREATE OR REPLACE FUNCTION "public"."calculo_saldo_inicial" (in _id_grupo int4, in _cod_emp text, in _local text , in _id_fechamento int, out _saida text) 
-RETURNS text
+CREATE OR REPLACE FUNCTION "public"."calculo_saldo_inicial" (in _id_grupo int4, in _cod_emp text, in _local text , in _id_fechamento int, out _saida int) 
+RETURNS int
 AS
 $$
 DECLARE
@@ -337,30 +338,59 @@ tempo    public.saldo_inicial%ROWTYPE;
 
 __saldo_f     numeric(15,4);
 
+_status text ;
+
 
 BEGIN
+
+   _saida = 0;
 
   FOR tempo in  
      
       SELECT *
       FROM   saldo_inicial SLD
       WHERE  SLD.id_grupo = _id_grupo and SLD.cod_emp = _cod_emp and SLD.local = _local and SLD.status = '0' 
-      ORDER BY SLD.id_grupo,SLD.cod_emp,SLD.local,SLD.material limit 300
+      ORDER BY SLD.id_grupo,SLD.cod_emp,SLD.local,SLD.material 
 
       LOOP      
-             // select _saldo_f from seek_entrada_2(tempo.id_grupo,tempo.id_planilha,tempo.nro_linha,tempo.cod_emp,tempo.local,tempo.material,tempo.dt_ref,tempo.saldo,_id_fechamento) into __saldo_f ;
+      
+             _status = '0';
+             
+             select _saldo_f from seek_entrada_saldo(tempo.id_grupo,tempo.cod_emp,tempo.local,tempo.material,tempo.saldo_inicial,_id_fechamento) into __saldo_f ;
             
-             // update nfe_det_trade set saldo = __saldo_f , status = '1' where id_grupo = tempo.id_grupo and id_planilha = tempo.id_planilha and nro_linha = tempo.nro_linha;
+             if (__saldo_f = 0) then
+                _status = '1';
+             else    
+                 if (__saldo_f = tempo.saldo_inicial) then
+                   _status := '3';
+                 else 
+                   _status := '2';
+                 end if;
+             end if;
+             
+             update saldo_inicial set status = _status, saldo_implantado = saldo_inicial - __saldo_f  where id_grupo = tempo.id_grupo and cod_emp = tempo.cod_emp and local = tempo.local and material = tempo.material;
+             
+             _saida := _saida + 1;
 
       END LOOP;
 
-     _saida = 'OK';
+    
 
 END;
 $$
 LANGUAGE 'plpgsql'
 go
 
+/*
+select * from calculo_saldo_inicial(1,'1004','0001',1)
+
+select sld.*,ent.nro_doc,ent.material,ent.quantidade_1,ent.saldo,con.qtd_e,(ent.quantidade_1 - ent.saldo) as saldo_inicial, ent.saldo_inicial
+from   saldo_inicial sld
+inner join controle_s con on con.id_grupo = sld.id_grupo and con.id_fechamento = 1 and con.cod_emp = sld.cod_emp and con.local = sld.local and con.material = sld.material
+inner join nfe_det_trade  ent on ent.id_grupo = sld.id_grupo and ent.id_planilha = con.id_e and ent.nro_linha = con.nro_linha_e
+where  sld.id_grupo = 1 and sld.cod_emp = '1004' and sld.local = '0001'
+order by ent.dt_ref,ent.nro_doc,sld.material
+*/
 
 DROP TYPE IF EXISTS Sai_Dev;
 CREATE TYPE Sai_Dev AS 
@@ -1335,3 +1365,34 @@ END;
 $$
 LANGUAGE 'plpgsql'
 GO
+
+
+CREATE OR REPLACE FUNCTION function_controle_sld()
+  RETURNS TRIGGER 
+  LANGUAGE PLPGSQL
+  AS
+$$
+DECLARE 
+   _saldo   numeric(15,4);
+   _qtd     numeric(15,4);
+   _status  text;
+BEGIN
+   IF  (TG_OP = 'INSERT') THEN
+       // NFE ENTRADA
+       update nfe_det_trade set saldo = saldo - NEW.qtd_e, saldo_inicial = saldo_inicial + NEW.qtd_e where id_grupo = NEW.id_grupo and id_planilha = NEW.id_e and nro_linha = NEW.nro_linha_e;
+       RETURN NEW;
+   END IF;
+END ;
+$$
+GO
+
+
+DROP TRIGGER IF EXISTS  trigger_controle_sld ON public.controle_s;
+GO
+
+CREATE TRIGGER trigger_controle_sld
+  AFTER INSERT
+  ON controle_s
+  FOR EACH ROW
+  EXECUTE PROCEDURE function_controle_sld()
+go

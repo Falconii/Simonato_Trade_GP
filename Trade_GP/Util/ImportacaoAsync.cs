@@ -497,7 +497,8 @@ namespace Trade_GP.Util
                                         "layout,         " +
                                         "qtd_dev,           " +
                                         "Id_Saida,          " +
-                                        "Nro_Linha_Saida    " +
+                                        "Nro_Linha_Saida,    " +
+                                        "Saldo_Inicial      " +
                                         "   ) " +
                                         " VALUES ";
 
@@ -579,7 +580,8 @@ namespace Trade_GP.Util
                                                             $" '{obj.Layout}'," +
                                                             $"  {obj.Qtd_Dev.DoubleParseDb()}, "+
                                                             $"  {obj.Id_Saida}, " +
-                                                            $"  {obj.Nro_Linha_Saida}  " +
+                                                            $"  {obj.Nro_Linha_Saida} , " +
+                                                            $"  {obj.Saldo_Inicial}  " +
                                                             " ) ";
 
 
