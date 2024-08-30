@@ -170,18 +170,46 @@ namespace Trade_GP
                 e.Value = stringValue;
             }
         }
-        private void NewTarefas()
+        private async Task<int> NewTarefas(ParamLocal param)
         {
-            int seq = 1;
+            int seq = 0;
+
+            int total = 0;
+
+            int vezes = 0;
+
+            int resto = 0;
+
+            int retorno = 0;
+
+            daoSaldo daosaldo = new daoSaldo();
 
             lsTarefas.Clear();
 
-            foreach (var data in Parametros[0].Periodos)
+            try
+            {
+                total = await daosaldo.GetContador(1, param.Cod_Emp, param.Local);
+
+            } catch(Exception ex)
+            {
+                total = 0;
+            }
+
+            vezes = total / 300;
+
+            resto = total % 300;
+
+            if (resto > 0)
+            {
+                vezes++;
+            }
+
+            for( seq = 1; seq <= vezes; seq++)
             {
                 tarefa obj = new tarefa()
                 {
                     Sequencia = seq,
-                    Descricao = $"{data.Data}",
+                    Descricao = $"Lote {seq}",
                     Inicial = null,
                     Final = null,
                     Observacao = "",
@@ -189,10 +217,11 @@ namespace Trade_GP
                 };
 
                 lsTarefas.Add(obj);
-                seq++;
             }
-
+ 
             LoadDbGridLog();
+
+            return lsTarefas.Count();
         }
         private void LoadDbGridLog()
         {
@@ -221,20 +250,30 @@ namespace Trade_GP
             if ((int)btProcessar.Tag == 0) // Processamento
             {
                 Cancelar = false;
-
-                lblProcesso.Text = "Iniciando Processo!";
-                pgProcesso.Value = 1;
-                pgProcesso.Minimum = 0;
-                pgProcesso.Maximum = lsTarefas.Count + 1;
-
+                
                 status_processando();
 
                 int resultado = -1;
 
+                int Nro_Locais = 0;
+
+                lblProcesso.Text = "Processando Local";
+                pgProcesso.Value = 1;
+                pgProcesso.Minimum = 0;
+                pgProcesso.Maximum = this.Parametros.Count();
+
                 foreach (var par in Parametros)
                 {
+                    Nro_Locais++;
 
-                    NewTarefas();
+                    pgProcesso.Value = Nro_Locais;
+
+                    int NroTarefas = await NewTarefas(par);
+
+                    if (NroTarefas == 0)
+                    {
+                        continue;
+                    }
 
                     resultado = await processamento(UsuarioSistema.Id_Grupo, par.Cod_Emp, par.Local);
 
@@ -314,31 +353,25 @@ namespace Trade_GP
 
             string Periodo = "";
 
-            int _qtd_dev = 0;
+            int _qtd_saldos = 0;
 
-            pgProcesso.Value = 0;
-
-            daoNfeDetTrade daoDet = new daoNfeDetTrade();
+            daoSaldo daosaldo = new daoSaldo();
 
             foreach (tarefa tar in lsTarefas)
             {
 
 
-                lblLocalPeriodo.Text = $"Local {local} - Data {tar.Descricao.Trim()} ";
+                lblLocalPeriodo.Text = $"Local {local} - Lote {tar.Sequencia} ";
                 i++;
-                lblProcesso.Text = $"Processando {i}/{lsTarefas.Count}";
-                pgProcesso.Value = i;
                 Periodo = tar.Descricao.Trim();
                 tar.Inicial = DateTime.Now;
                 await Task.Run(async delegate
                 {
-                    await Task.Delay(1000);
+                    await Task.Delay(300);
                 });
                 try
                 {
-
-                    _qtd_dev = await daoDet.Check_Devolucao(UsuarioSistema.Id_Grupo, cod_emp, local, Periodo);
-
+                    _qtd_saldos = await daosaldo.calculo_saldo_inicial(UsuarioSistema.Id_Grupo, cod_emp, local);
                 }
                 catch (Exception ex)
                 {
@@ -346,7 +379,7 @@ namespace Trade_GP
                 }
                 tar.Final = DateTime.Now;
                 tar.Status = "Processado !!!";
-                tar.Observacao = $"N° Devoluções Encontradas {_qtd_dev}.";
+                tar.Observacao = $"N° Produtos Processados {_qtd_saldos}.";
 
                 if (Cancelar)
                 {
@@ -371,8 +404,6 @@ namespace Trade_GP
             i = lsTarefas.Count;
 
             lblProcesso.Text = $"Processando Mês {i}/{lsTarefas.Count}";
-
-            pgProcesso.Value = i;
 
             return 1;
         }
@@ -441,7 +472,6 @@ namespace Trade_GP
 
             status_pre_processamento();
 
-            NewTarefas();
         }
 
         private void RegistrarProcessamentoEmTxt(string linha, string caminhoArquivo)
@@ -459,85 +489,7 @@ namespace Trade_GP
             }
         }
 
-        private void ConfigurarColunasDataGridView()
-        {
-            dbLocais.AutoResizeColumns();
-            dbLocais.Columns[0].HeaderText = "Empresa";
-            dbLocais.Columns[0].Width = 60;
-            dbLocais.Columns[0].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
-            dbLocais.Columns[1].HeaderText = "Local";
-            dbLocais.Columns[1].Width = 50;
-            dbLocais.Columns[1].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
-            dbLocais.Columns[2].HeaderText = "Razao";
-            dbLocais.Columns[2].Width = 300;
-            dbLocais.Columns[2].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleLeft;
-            dbLocais.Columns[3].HeaderText = "Observacao";
-            dbLocais.Columns[3].Width = 300;
-        }
-
-        private async Task<int> ProcessarTarefas(int id_grupo, string cod_emp, string local)
-        {
-            int i = 0;
-            string Periodo = "";
-            int _qtd_dev = 0;
-            pgProcesso.Value = 0;
-            daoNfeDetTrade daoDet = new daoNfeDetTrade();
-            string caminhoArquivo = "caminho_do_arquivo.txt"; // Defina o caminho do seu arquivo TXT
-
-            ConfigurarColunasDataGridView();
-
-            foreach (tarefa tar in lsTarefas)
-            {
-                lblLocalPeriodo.Text = $"Local {local} - Data {tar.Descricao.Trim()}";
-                i++;
-                lblProcesso.Text = $"Processando {i}/{lsTarefas.Count}";
-                pgProcesso.Value = i;
-                Periodo = tar.Descricao.Trim();
-                tar.Inicial = DateTime.Now;
-
-                await Task.Delay(1000);
-
-                try
-                {
-                    _qtd_dev = await daoDet.Check_Devolucao(UsuarioSistema.Id_Grupo, cod_emp, local, Periodo);
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show($"Erro: {ex.Message}");
-                }
-
-                tar.Final = DateTime.Now;
-                tar.Status = "Processado !!!";
-                tar.Observacao = $"N° Devoluções Encontradas {_qtd_dev}.";
-
-                if (Cancelar)
-                {
-                    tar.Observacao = "Cancelamento Solicitado !";
-                }
-
-                // Registrar a linha processada no arquivo TXT
-                string linhaProcessada = $"{cod_emp};{local};{Periodo};{tar.Observacao}";
-                RegistrarProcessamentoEmTxt(linhaProcessada, caminhoArquivo);
-
-                LoadDbGridLog();
-
-                if (Cancelar) break;
-            }
-
-            if (Cancelar)
-            {
-                while (i < lsTarefas.Count)
-                {
-                    lsTarefas[i].Observacao = "Cancelado !!";
-                    i++;
-                }
-            }
-
-            lblProcesso.Text = $"Processando Mês {i}/{lsTarefas.Count}";
-            pgProcesso.Value = i;
-
-            return 1;
-        }
+         
     }
 
 }

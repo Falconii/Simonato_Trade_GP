@@ -350,7 +350,7 @@ BEGIN
       SELECT *
       FROM   saldo_inicial SLD
       WHERE  SLD.id_grupo = _id_grupo and SLD.cod_emp = _cod_emp and SLD.local = _local and SLD.status = '0' 
-      ORDER BY SLD.id_grupo,SLD.cod_emp,SLD.local,SLD.material 
+      ORDER BY SLD.id_grupo,SLD.cod_emp,SLD.local,SLD.material limit 300
 
       LOOP      
       
@@ -533,7 +533,7 @@ BEGIN
                               dev.id_grupo,dev.id_planilha,dev.nro_linha,dev.id_operacao,dev.dt_ref,dev.cfop,dev.nro_doc,dev.item_ref,dev.material,dev.denom,dev.unid,dev.quantidade_1,dev.valor,dev.icst_valor,dev.fest_valor,dev.doc_origem,dev.id_saida,dev.nro_linha_saida
                               FROM       nfe_det_trade dev 
                               left join nfe_det_trade sai  ON  sai.id_grupo = _grupo and sai.cod_emp = _cod_emp  and sai.local = _local and ( (left(sai.cfop,4) = '5405')) and sai.id_operacao = 'S' and sai.nro_doc = dev.doc_origem and sai.material = dev.material
-                              where      dev.id_grupo = _grupo and dev.cod_emp = _cod_emp  and dev.local = _local and  to_char(dev.dt_ref,'MM/YYYY') = _mes_ano  and dev.id_operacao = 'Z' 
+                              where      dev.id_grupo = _grupo and dev.cod_emp = _cod_emp  and dev.local = _local and  to_char(dev.dt_ref,'DD/MM/YYYY') = _mes_ano  and dev.id_operacao = 'Z' 
                               order by   dev.id_grupo,dev.cod_emp,dev.local,dev.dt_ref,dev.dt_doc,dev.nro_item
 
             LOOP            

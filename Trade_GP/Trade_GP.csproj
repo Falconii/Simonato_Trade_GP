@@ -137,6 +137,7 @@
     <Compile Include="Dao\postgre\daoNfeCabTrade.cs" />
     <Compile Include="Dao\postgre\daoNfeDetTrade.cs" />
     <Compile Include="Dao\postgre\daoResumo5405.cs" />
+    <Compile Include="Dao\postgre\daoSaldo.cs" />
     <Compile Include="Dao\postgre\daoSelic.cs" />
     <Compile Include="Dao\postgre\daoUsuario.cs" />
     <Compile Include="DataBase\RunCommand.cs" />
@@ -268,6 +269,7 @@
     <Compile Include="Models\Nfe_DetE_Qry_01.cs" />
     <Compile Include="Models\ProgressReportModel.cs" />
     <Compile Include="Models\Resumo_5405.cs" />
+    <Compile Include="Models\Saldo.cs" />
     <Compile Include="Models\Selic.cs" />
     <Compile Include="Models\Usuario.cs" />
     <Compile Include="Program.cs" />

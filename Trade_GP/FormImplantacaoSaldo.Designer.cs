@@ -60,7 +60,7 @@ namespace Trade_GP
             this.lblTitulo.Name = "lblTitulo";
             this.lblTitulo.Size = new System.Drawing.Size(2111, 28);
             this.lblTitulo.TabIndex = 57;
-            this.lblTitulo.Text = "Validações Das Devoluções";
+            this.lblTitulo.Text = "Implantação de Saldos";
             this.lblTitulo.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // dbLocais

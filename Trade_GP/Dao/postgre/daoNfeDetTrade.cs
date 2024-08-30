@@ -518,7 +518,6 @@ namespace Trade_GP.Dao.postgre
             return _saida;
 
         }
-
         public async Task<int> Saldosv2(int id_grupo, string cod_emp, string local, string periodo)
         {
 
@@ -570,7 +569,6 @@ namespace Trade_GP.Dao.postgre
             return _saida;
 
         }
-
         public async Task<string> Vlr_Economico(int id_grupo, string cod_emp, string local, string periodo, int ano_selic, int mes_selic)
         {
 

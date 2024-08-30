@@ -41,6 +41,7 @@ namespace Trade_GP
             this.processamentoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.consultasToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.processamentosToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItem4 = new System.Windows.Forms.ToolStripMenuItem();
             this.validaçãoDevuluçõesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.processamentoEstoqueToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem3 = new System.Windows.Forms.ToolStripMenuItem();
@@ -51,7 +52,6 @@ namespace Trade_GP
             this.relatóriosToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuJanelas = new System.Windows.Forms.ToolStripMenuItem();
             this.sobreToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripMenuItem4 = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -161,12 +161,18 @@ namespace Trade_GP
             this.processamentosToolStripMenuItem.Size = new System.Drawing.Size(129, 24);
             this.processamentosToolStripMenuItem.Text = "Processamentos";
             // 
+            // toolStripMenuItem4
+            // 
+            this.toolStripMenuItem4.Name = "toolStripMenuItem4";
+            this.toolStripMenuItem4.Size = new System.Drawing.Size(327, 26);
+            this.toolStripMenuItem4.Text = "Implantação De Saldos";
+            this.toolStripMenuItem4.Click += new System.EventHandler(this.toolStripMenuItem4_Click);
+            // 
             // validaçãoDevuluçõesToolStripMenuItem
             // 
             this.validaçãoDevuluçõesToolStripMenuItem.Name = "validaçãoDevuluçõesToolStripMenuItem";
             this.validaçãoDevuluçõesToolStripMenuItem.Size = new System.Drawing.Size(327, 26);
             this.validaçãoDevuluçõesToolStripMenuItem.Text = "Validação Devoluções";
-            this.validaçãoDevuluçõesToolStripMenuItem.Visible = false;
             this.validaçãoDevuluçõesToolStripMenuItem.Click += new System.EventHandler(this.validaçãoDevuluçõesToolStripMenuItem_Click);
             // 
             // processamentoEstoqueToolStripMenuItem
@@ -182,7 +188,6 @@ namespace Trade_GP
             this.toolStripMenuItem3.Name = "toolStripMenuItem3";
             this.toolStripMenuItem3.Size = new System.Drawing.Size(327, 26);
             this.toolStripMenuItem3.Text = "Processamento Estoque Lote Diário";
-            this.toolStripMenuItem3.Visible = false;
             this.toolStripMenuItem3.Click += new System.EventHandler(this.toolStripMenuItem3_Click);
             // 
             // cálculoValorEconômicoToolStripMenuItem
@@ -236,13 +241,6 @@ namespace Trade_GP
             this.sobreToolStripMenuItem.Text = "Sobre";
             this.sobreToolStripMenuItem.Click += new System.EventHandler(this.sobreToolStripMenuItem_Click);
             // 
-            // toolStripMenuItem4
-            // 
-            this.toolStripMenuItem4.Name = "toolStripMenuItem4";
-            this.toolStripMenuItem4.Size = new System.Drawing.Size(327, 26);
-            this.toolStripMenuItem4.Text = "Implantação De Saldos";
-            this.toolStripMenuItem4.Click += new System.EventHandler(this.toolStripMenuItem4_Click);
-            // 
             // FormPrincipal
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
@@ -251,7 +249,7 @@ namespace Trade_GP
             this.Controls.Add(this.menuStrip1);
             this.IsMdiContainer = true;
             this.MainMenuStrip = this.menuStrip1;
-            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "FormPrincipal";
             this.Text = "Fromulário Principal";
             this.WindowState = System.Windows.Forms.FormWindowState.Maximized;

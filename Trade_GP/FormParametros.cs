@@ -36,6 +36,7 @@ namespace Trade_GP
             tvPeriodo.Nodes.Clear();
             if (this.Saldos)
             {
+                lblPeriodo.Visible = false;
                 tvPeriodo.Visible = false;
             }
         }

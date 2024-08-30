@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using Trade_GP.Dao.postgre;
 using Trade_GP.Util;
+using Trade_GP.Extensoes;
 
 namespace Trade_GP
 {
@@ -17,6 +18,8 @@ namespace Trade_GP
         private List<GridLocais> lsLocais = new List<GridLocais>();
 
         private List<tarefa> lsTarefas = new List<tarefa>();
+
+        private List<meses> lsMeses = new List<meses>();
 
         private Boolean btProximoFlag = false;
 
@@ -133,8 +136,8 @@ namespace Trade_GP
             dtGridLog.AutoResizeColumns();
             dtGridLog.Columns[00].HeaderText = "Seq";
             dtGridLog.Columns[00].Width = 50;
-            dtGridLog.Columns[01].HeaderText = "MÊS E ANO";
-            dtGridLog.Columns[01].Width = 400;
+            dtGridLog.Columns[01].HeaderText = "Data";
+            dtGridLog.Columns[01].Width = 120;
             dtGridLog.Columns[01].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleLeft;
             dtGridLog.Columns[02].HeaderText = "Inicio";
             dtGridLog.Columns[02].Width = 120;
@@ -143,7 +146,7 @@ namespace Trade_GP
             dtGridLog.Columns[03].Width = 120;
             dtGridLog.Columns[03].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
             dtGridLog.Columns[04].HeaderText = "Observação";
-            dtGridLog.Columns[04].Width = 350;
+            dtGridLog.Columns[04].Width = 190;
             dtGridLog.Columns[04].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleLeft;
             dtGridLog.Columns[05].HeaderText = "Status";
             dtGridLog.Columns[05].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
@@ -167,18 +170,130 @@ namespace Trade_GP
                 e.Value = stringValue;
             }
         }
-        private void NewTarefas()
+
+        private void LoadDbMeses()
+        {
+
+            var bindingList = new BindingList<meses>(lsMeses);
+
+            var source = new BindingSource(bindingList, null);
+
+            dbMeses.DataSource = source;
+
+            ConfiguraDbMeses();
+
+        }
+        private void ConfiguraDbMeses()
+        {
+            dbMeses.AutoResizeColumns();
+            dbMeses.Columns[00].HeaderText = "Seq";
+            dbMeses.Columns[00].Width = 50;
+            dbMeses.Columns[00].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            dbMeses.Columns[01].HeaderText = "Mês E Ano";
+            dbMeses.Columns[01].Width = 80;
+            dbMeses.Columns[01].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            dbMeses.Columns[02].HeaderText = "Notas";
+            dbMeses.Columns[02].Width = 80;
+            dbMeses.Columns[02].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight;
+            dbMeses.Columns[03].HeaderText = "Status";
+            dbMeses.Columns[03].Width = 100;
+            dbMeses.Columns[03].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleLeft;
+
+            dbMeses.ColumnHeadersDefaultCellStyle.BackColor = Color.LightGray;
+            dbMeses.ColumnHeadersDefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            dbMeses.BorderStyle = BorderStyle.Fixed3D;
+            dbMeses.EnableHeadersVisualStyles = false;
+            dbMeses.ShowEditingIcon = false;
+
+
+        }
+        private async Task<int> contagem(int id_grupo, string cod_emp, string local)
+        {
+            int result = 0;
+
+            int i = 0;
+
+            string Periodo = "";
+
+            int _qtd_notas = 0;
+
+            pgProcesso.Value = 0;
+
+            daoNfeDetTrade daoDet = new daoNfeDetTrade();
+
+            foreach (meses mes in lsMeses)
+            {
+
+
+                lblLocalPeriodo.Text = $"Local {local} -  Mês {mes.Mes} ";
+                i++;
+                lblProcesso.Text = $"Contagem {i}/{lsMeses.Count}";
+                //pgProcesso.Value = i;
+                mes.Status = "Processando...";
+
+                try
+                {
+
+                    _qtd_notas = await daoDet.Processou_Devolucao(UsuarioSistema.Id_Grupo, cod_emp, local, mes.Mes);
+
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Erro: {ex.Message}");
+                }
+
+                mes.Registros = _qtd_notas ;
+
+                mes.Status = _qtd_notas > 0 ? "Aguardando..!" : "Processado..!";
+
+                if (Cancelar)
+                {
+                    mes.Status = "Processamento Cancelado!";
+                }
+
+                LoadDbMeses();
+
+                if (Cancelar) break;
+
+            }
+
+
+            if (Cancelar)
+            {
+                while (i < lsMeses.Count)
+                {
+                    lsMeses[i].Status = "Cancelado !!";
+                    i++;
+                };
+                result = -1;
+            }
+
+            i = lsMeses.Count;
+
+            lblProcesso.Text = $"Processando Mês {i}/{lsMeses.Count}";
+
+            //pgProcesso.Value = i;
+
+            return result;
+        }
+        private void NewTarefas(string periodo)
         {
             int seq = 1;
 
+            string[] mes_ano = periodo.Split('/');
+
+            int ultimoDia = DateTime.DaysInMonth(mes_ano[1].IntParse(), mes_ano[0].IntParse());
+
             lsTarefas.Clear();
 
-            foreach (var data in Parametros[0].Periodos)
+            for (int dia = 1; dia <= ultimoDia; dia++)
             {
+                var hoje = new DateTime(mes_ano[1].IntParse(), mes_ano[0].IntParse(), dia);
+
                 tarefa obj = new tarefa()
                 {
                     Sequencia = seq,
-                    Descricao = $"{data.Data}",
+                    Data = hoje.ToString("dd/MM/yyyy"),
                     Inicial = null,
                     Final = null,
                     Observacao = "",
@@ -206,12 +321,23 @@ namespace Trade_GP
         private class tarefa
         {
             public int Sequencia { get; set; }
-            public string Descricao { get; set; }
+            public string Data { get; set; }
             public DateTime? Inicial { get; set; }
             public DateTime? Final { get; set; }
             public string Observacao { get; set; }
             public string Status { get; set; }
         }
+
+        private class meses
+        {
+            public int Sequencia { get; set; }
+            public string Mes { get; set; }
+            public int Registros { get; set; }
+            public string Status { get; set; }
+        }
+
+
+
         private async void btProcessar_Click(object sender, EventArgs e)
         {
 
@@ -219,21 +345,25 @@ namespace Trade_GP
             {
                 Cancelar = false;
 
-                lblProcesso.Text = "Iniciando Processo!";
+                lblProcesso.Text = "Locais";
                 pgProcesso.Value = 1;
                 pgProcesso.Minimum = 0;
-                pgProcesso.Maximum = lsTarefas.Count + 1;
+                pgProcesso.Maximum = Parametros.Count;
 
                 status_processando();
 
                 int resultado = -1;
 
+                int rowMeses = 0;
+
                 foreach (var par in Parametros)
                 {
 
-                    NewTarefas();
+                    pgProcesso.Value = rowMeses+1;
 
-                    resultado = await processamento(UsuarioSistema.Id_Grupo, par.Cod_Emp, par.Local);
+                    getMeses();
+
+                    resultado = await contagem(UsuarioSistema.Id_Grupo, par.Cod_Emp, par.Local);
 
                     if (Cancelar)
                     {
@@ -263,10 +393,40 @@ namespace Trade_GP
                         break;
                     }
 
+                    if (Cancelar)
+                    {
+                        return;
+                    }
+
+
+                    foreach (var mes in lsMeses)
+                    {
+                        if (mes.Registros == 0)
+                        {
+                            mes.Status = "Ignorado!";
+                            dbMeses.InvalidateCell(3, rowMeses);
+                            rowMeses++;
+                            continue;
+                        }
+
+                        NewTarefas(mes.Mes);
+
+                        await Task.Run(async delegate
+                        {
+                            await Task.Delay(1000);
+                        });
+
+                        resultado = await processamento(UsuarioSistema.Id_Grupo, par.Cod_Emp, par.Local);
+
+                        mes.Status = "OK";
+
+                        dbMeses.InvalidateCell(3, rowMeses);
+
+                        rowMeses++;
+                    }
                 }
 
                 status_processado();
-
 
                 return;
             }
@@ -313,7 +473,7 @@ namespace Trade_GP
 
             int _qtd_dev = 0;
 
-            pgProcesso.Value = 0;
+            //pgProcesso.Value = 0;
 
             daoNfeDetTrade daoDet = new daoNfeDetTrade();
 
@@ -321,11 +481,10 @@ namespace Trade_GP
             {
 
 
-                lblLocalPeriodo.Text = $"Local {local} - Data {tar.Descricao.Trim()} ";
+                lblLocalPeriodo.Text = $"Local {local} - Data {tar.Observacao.Trim()} ";
                 i++;
-                lblProcesso.Text = $"Processando {i}/{lsTarefas.Count}";
-                pgProcesso.Value = i;
-                Periodo = tar.Descricao.Trim();
+                //pgProcesso.Value = i;
+                Periodo = tar.Data;
                 tar.Inicial = DateTime.Now;
                 await Task.Run(async delegate
                 {
@@ -342,15 +501,25 @@ namespace Trade_GP
                     MessageBox.Show($"Erro: {ex.Message}");
                 }
                 tar.Final = DateTime.Now;
-                tar.Status = "Processado !!!";
+
+                TimeSpan tempo = (TimeSpan)(tar.Final - tar.Inicial);
+
+                string elapsedTime = String.Format("{0:00}:{1:00}:{2:00}", tempo.Hours, tempo.Minutes, tempo.Seconds);
+
+                tar.Status = $"Processado {elapsedTime}";
+
                 tar.Observacao = $"N° Devoluções Encontradas {_qtd_dev}.";
+
+
+                dtGridLog.InvalidateCell(2, i - 1);
+                dtGridLog.InvalidateCell(3, i - 1);
+                dtGridLog.InvalidateCell(4, i - 1);
+                dtGridLog.InvalidateCell(5, i - 1);
 
                 if (Cancelar)
                 {
                     tar.Observacao = "Cancelamento Solicitado !";
                 }
-
-                LoadDbGridLog();
 
                 if (Cancelar) break;
 
@@ -369,14 +538,15 @@ namespace Trade_GP
 
             lblProcesso.Text = $"Processando Mês {i}/{lsTarefas.Count}";
 
-            pgProcesso.Value = i;
+           // pgProcesso.Value = i;
 
             return 1;
         }
         private void status_inical()
         {
             gbMensaProcessamento.Visible = false;
-            lbTituloErros.Visible = false;
+            dbMeses.Visible = false;
+            lbTituloMeses.Visible = false;
             btExcel.Visible = false;
             dtGridLog.Visible = false;
             dbLocais.Visible = false;
@@ -388,8 +558,9 @@ namespace Trade_GP
         private void status_pre_processamento()
         {
             gbMensaProcessamento.Visible = true;
-            lbTituloErros.Visible = false;
+            lbTituloMeses.Visible = false;
             btExcel.Visible = false;
+            dbMeses.Visible = false;
             dtGridLog.Visible = false;
             dbLocais.Visible = true;
             btProcessar.Enabled = true;
@@ -400,8 +571,9 @@ namespace Trade_GP
         private void status_processando()
         {
             gbMensaProcessamento.Visible = true;
-            lbTituloErros.Visible = true;
+            lbTituloMeses.Visible = true;
             btExcel.Visible = true;
+            dbMeses.Visible = true;
             dtGridLog.Visible = true;
             dbLocais.Visible = true;
             btProcessar.Text = "Cancelar Processamento";
@@ -411,8 +583,9 @@ namespace Trade_GP
         private void status_aguardando_cancelar()
         {
             gbMensaProcessamento.Visible = true;
-            lbTituloErros.Visible = true;
+            lbTituloMeses.Visible = true;
             btExcel.Visible = true;
+            dbMeses.Visible = true;
             dtGridLog.Visible = true;
             dbLocais.Visible = true;
             btProcessar.Text = "Voltar Ao Processamento";
@@ -438,9 +611,25 @@ namespace Trade_GP
 
             status_pre_processamento();
 
-            NewTarefas();
+            //NewTarefas();
         }
 
+        private void getMeses()
+        {
+            lsMeses.Clear();
+            int idx = 1;
+            foreach (var periodo in Parametros[0].Periodos)
+            {
+                meses obj = new meses()
+                {
+                    Sequencia = idx++,
+                    Mes = periodo.Data,
+                    Registros = 0,
+                    Status = "Aguardando Processamento!"
+                };
+                lsMeses.Add(obj);
+            }
+        }
         private void RegistrarProcessamentoEmTxt(string linha, string caminhoArquivo)
         {
             try
@@ -476,8 +665,9 @@ namespace Trade_GP
         {
             int i = 0;
             string Periodo = "";
+            
             int _qtd_dev = 0;
-            pgProcesso.Value = 0;
+
             daoNfeDetTrade daoDet = new daoNfeDetTrade();
             string caminhoArquivo = "caminho_do_arquivo.txt"; // Defina o caminho do seu arquivo TXT
 
@@ -485,11 +675,9 @@ namespace Trade_GP
 
             foreach (tarefa tar in lsTarefas)
             {
-                lblLocalPeriodo.Text = $"Local {local} - Data {tar.Descricao.Trim()}";
+                lblLocalPeriodo.Text = $"Local {local} - Data {tar.Observacao.Trim()}";
                 i++;
-                lblProcesso.Text = $"Processando {i}/{lsTarefas.Count}";
-                pgProcesso.Value = i;
-                Periodo = tar.Descricao.Trim();
+                Periodo = tar.Observacao.Trim();
                 tar.Inicial = DateTime.Now;
 
                 await Task.Delay(1000);
@@ -530,11 +718,10 @@ namespace Trade_GP
                 }
             }
 
-            lblProcesso.Text = $"Processando Mês {i}/{lsTarefas.Count}";
-            pgProcesso.Value = i;
-
             return 1;
         }
+
+
     }
 }
 
