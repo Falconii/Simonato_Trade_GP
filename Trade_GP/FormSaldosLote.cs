@@ -116,7 +116,7 @@ namespace Trade_GP
 
             status_inical();
 
-            var parametros = new FormParametros();
+            var parametros = new FormParametros("3");
 
             var Result = parametros.ShowDialog();
 

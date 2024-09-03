@@ -98,11 +98,11 @@ namespace Trade_GP
             this.gbMensaProcessamento.Controls.Add(this.lblProcesso);
             this.gbMensaProcessamento.Controls.Add(this.pgProcesso);
             this.gbMensaProcessamento.Controls.Add(this.btProcessar);
-            this.gbMensaProcessamento.Location = new System.Drawing.Point(1263, 46);
-            this.gbMensaProcessamento.Margin = new System.Windows.Forms.Padding(4, 4, 10, 4);
+            this.gbMensaProcessamento.Location = new System.Drawing.Point(1235, 46);
+            this.gbMensaProcessamento.Margin = new System.Windows.Forms.Padding(4);
             this.gbMensaProcessamento.Name = "gbMensaProcessamento";
             this.gbMensaProcessamento.Padding = new System.Windows.Forms.Padding(4);
-            this.gbMensaProcessamento.Size = new System.Drawing.Size(545, 151);
+            this.gbMensaProcessamento.Size = new System.Drawing.Size(573, 151);
             this.gbMensaProcessamento.TabIndex = 44;
             this.gbMensaProcessamento.TabStop = false;
             this.gbMensaProcessamento.Text = "Atenção";
@@ -132,15 +132,15 @@ namespace Trade_GP
             this.pgProcesso.Location = new System.Drawing.Point(8, 53);
             this.pgProcesso.Margin = new System.Windows.Forms.Padding(4);
             this.pgProcesso.Name = "pgProcesso";
-            this.pgProcesso.Size = new System.Drawing.Size(537, 28);
+            this.pgProcesso.Size = new System.Drawing.Size(511, 28);
             this.pgProcesso.TabIndex = 1;
             // 
             // btProcessar
             // 
-            this.btProcessar.Location = new System.Drawing.Point(228, 103);
+            this.btProcessar.Location = new System.Drawing.Point(258, 103);
             this.btProcessar.Margin = new System.Windows.Forms.Padding(4);
             this.btProcessar.Name = "btProcessar";
-            this.btProcessar.Size = new System.Drawing.Size(317, 28);
+            this.btProcessar.Size = new System.Drawing.Size(261, 28);
             this.btProcessar.TabIndex = 0;
             this.btProcessar.Tag = "0";
             this.btProcessar.Text = "Processamento";
@@ -170,8 +170,9 @@ namespace Trade_GP
             // 
             // dtGridLog
             // 
-            this.dtGridLog.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left)));
+            this.dtGridLog.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.dtGridLog.CausesValidation = false;
             this.dtGridLog.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dtGridLog.Location = new System.Drawing.Point(553, 255);

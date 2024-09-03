@@ -108,7 +108,7 @@ namespace Trade_GP
         }
         private void btParametros_Click(object sender, EventArgs e)
         {
-            var parametros = new FormParametros(true);
+            var parametros = new FormParametros("1");
 
             var Result = parametros.ShowDialog();
 
@@ -378,15 +378,23 @@ namespace Trade_GP
                     MessageBox.Show($"Erro: {ex.Message}");
                 }
                 tar.Final = DateTime.Now;
-                tar.Status = "Processado !!!";
+
+                TimeSpan tempo = (TimeSpan)(tar.Final - tar.Inicial);
+
+                string elapsedTime = String.Format("{0:00}:{1:00}:{2:00}", tempo.Hours, tempo.Minutes, tempo.Seconds);
+
+                tar.Status = $"Processado! {elapsedTime}";
+
                 tar.Observacao = $"N° Produtos Processados {_qtd_saldos}.";
 
                 if (Cancelar)
                 {
                     tar.Observacao = "Cancelamento Solicitado !";
                 }
-
-                LoadDbGridLog();
+                dtGridLog.InvalidateCell(2, i - 1);
+                dtGridLog.InvalidateCell(3, i-1);
+                dtGridLog.InvalidateCell(4, i-1);
+                dtGridLog.InvalidateCell(5, i-1);
 
                 if (Cancelar) break;
 

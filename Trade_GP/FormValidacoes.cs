@@ -108,7 +108,7 @@ namespace Trade_GP
         }
         private void btParametros_Click(object sender, EventArgs e)
         {
-            var parametros = new FormParametros();
+            var parametros = new FormParametros("3");
 
             var Result = parametros.ShowDialog();
 
@@ -410,12 +410,7 @@ namespace Trade_GP
                         }
 
                         NewTarefas(mes.Mes);
-
-                        await Task.Run(async delegate
-                        {
-                            await Task.Delay(1000);
-                        });
-
+                                                
                         resultado = await processamento(UsuarioSistema.Id_Grupo, par.Cod_Emp, par.Local);
 
                         mes.Status = "OK";
@@ -488,7 +483,7 @@ namespace Trade_GP
                 tar.Inicial = DateTime.Now;
                 await Task.Run(async delegate
                 {
-                    await Task.Delay(1000);
+                    await Task.Delay(300);
                 });
                 try
                 {

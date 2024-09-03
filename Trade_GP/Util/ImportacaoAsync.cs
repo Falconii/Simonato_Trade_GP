@@ -27,6 +27,8 @@ namespace Trade_GP.Util
 
         public static List<ContDetProc> lsMoviDets = new List<ContDetProc>(); // Lista para armazenar detalhes de movimentação
 
+        public static DateTime Data_Implantacao_Saldo = DateTime.Parse("28/02/2017"); 
+
         //public static string FiltroCFOP = "1000#1100#1101#1102#1111#1116#1117#1118#1120#1121#1122#1150#1151#1152#1201#1202#1203#1204#1208#1209#1401#1403#1408#1409#1410#1411#1949#2000#2100#2101#2102#2111#2113#2116#2117#2118#2120#2121#2122#2150#2151#2152#2153#2154#2200#2201#2202#2203#2204#2208#2209#2401#2403#2408#2409#2410#2411#2949#5100#5101#5102#5103#5104#5105#5106#5109#5110#5111#5112#5113#5114#5115#5116#5117#5118#5119#5120#5122#5123#5124#5125#5150#5151#5152#5200#5201#5202#5208#5209#5400#5401#5402#5403#5405#5408#5409#5410#5411#5949#6000#6100#6101#6102#6103#6104#6105#6106#6107#6108#6109#6110#6111#6112#6113#6114#6115#6116#6117#6118#6119#6120#6122#6123#6124#6125#6150#6151#6152#6155#6156#6200#6201#6202#6208#6209#6400#6401#6402#6403#6404#6408#6409#6410#6411#6949";
 
         //public static string FiltroCFOP = "1000#1100#1101#1102#1111#1116#1117#1118#1120#1121#1122#1150#1151#1152#1201#1202#1203#1204#1208#1209#1401#1403#1408#1409#1410#1411#1949#2000#2100#2101#2102#2111#2113#2116#2117#2118#2120#2121#2122#2150#2151#2152#2153#2154#2200#2201#2202#2203#2204#2208#2209#2401#2403#2408#2409#2410#2411#2949" +
@@ -177,6 +179,7 @@ namespace Trade_GP.Util
                                     }
                                 }
                             }
+                                                                                   
 
                             if (!(ItsOK(fields[12], filtroCfop))) {
 
@@ -860,7 +863,9 @@ namespace Trade_GP.Util
             {
                 if (cfop.Substring(0,4) == "5405")
                 {
+
                     retorno = false;
+
                 } else
                 {
                     retorno = (FiltroCFOPTodas.Contains(cfop.Substring(0, 1)));
@@ -871,7 +876,6 @@ namespace Trade_GP.Util
             if (filtroCfop == "5405")
             {
                 retorno = (cfop.Substring(0, 4) == "5405");
-
             }
 
             return retorno;
@@ -890,7 +894,7 @@ namespace Trade_GP.Util
                 {
                     if (((det.Icst_Valor + det.Fest_Valor) == 0) && (det.Sit_Trib == "6"))
                     {
-                        return "Z";
+                        retorno =  "Z";
                     }
                     else
                     {
@@ -900,14 +904,23 @@ namespace Trade_GP.Util
                 {
                     if ((det.Icst_Valor + det.Fest_Valor) > 0)
                     {
-                        return "E";
+                        retorno = "E";
                     }
                     else
                     {
                         retorno = "e";
                     }
                 }
+
+                if ((retorno == "E") || (retorno == "e"))
+                {
+                    if (det.Dt_Ref.CompareTo(Data_Implantacao_Saldo) <= 0)
+                    {
+                        retorno = retorno == "E" ? "X" : "x";
+                    }
+                }
             }
+
 
             if ("567".Contains(det.Cfop.Substring(0, 1)))
             {
