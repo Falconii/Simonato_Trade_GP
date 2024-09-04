@@ -13,7 +13,7 @@
 
     */
 
-    CREATE OR REPLACE FUNCTION "public"."seek_in_2V1"(
+    CREATE OR REPLACE FUNCTION "public"."seek_in_2v1"(
     in  _id_grupo     int4,
     in  _id_s         int4,
     in  _nro_linha_s  int4,
@@ -114,7 +114,7 @@
 
     */
 
-    CREATE OR REPLACE FUNCTION "public"."seek_in_2V2"(
+    CREATE OR REPLACE FUNCTION "public"."seek_in_2v2"(
     in  _id_grupo     int4,
     in  _id_s         int4,
     in  _nro_linha_s  int4,
@@ -149,7 +149,7 @@
            SELECT *
            FROM NFE_DET_TRADE ENT
            WHERE  ENT.id_grupo = _id_grupo and ENT.cod_emp = _cod_empresa and ENT.local = _local and ENT.material = _material and 
-                  ((ENT.dt_ref >= '2017-03-01' AND ENT.id_operacao = 'e' AND ENT.saldo > 0) OR (ENT.dt_ref <= '2017-02-28' AND ENT.id_operacao = 'e'  AND ENT.saldo_inical > 0)) 
+                  ((ENT.dt_ref >= '2017-03-01' AND ENT.id_operacao = 'e' AND ENT.saldo > 0) OR (ENT.dt_ref <= '2017-02-28' AND ENT.id_operacao = 'e'  AND ENT.saldo_inicial > 0)) 
                   and ( ENT.dt_ref <= _data)
            ORDER BY ENT.cod_emp,ENT.local,ENT.material,ENT.id_operacao,ENT.dt_ref asc
         LOOP     
@@ -208,7 +208,7 @@
 
 
     drop function seek_entrada_saldo;
-    CREATE OR REPLACE FUNCTION "public"."seek_entrada_saldo" (
+    CREATE OR REPLACE FUNCTION "public"."seek_entrada_saldo"(
     in  _id_grupo     int4,
     in  _cod_empresa  text,
     in  _local        text,
@@ -301,7 +301,7 @@
 
 
     */ 
-    CREATE OR REPLACE FUNCTION "public"."seek_saida_2" (
+    CREATE OR REPLACE FUNCTION "public"."seek_saida_2"(
     in  _id_grupo      int4,
     in  _cod_empresa   text,
     in  _local         text,
@@ -727,11 +727,11 @@
                 update nfe_det_trade set qtd_dev = qtd_dev + NEW.qtd_d where id_grupo = NEW.id_grupo and id_planilha = NEW.id_s and nro_linha = NEW.nro_linha_s;
            else 
                 _data    := Date '2017-02-28';
-                select dt_ref from nfe_det_trade _dt_ref where id_grupo = NEW.id_grupo and id_planilha = NEW.id_e and nro_linha = NEW.nro_linha_e;
+                select dt_ref from nfe_det_trade  into _dt_ref where id_grupo = NEW.id_grupo and id_planilha = NEW.id_e and nro_linha = NEW.nro_linha_e;
                 if (_dt_ref <= _data) then
                     update nfe_det_trade set saldo_inicial = saldo_inicial - NEW.qtd_e where id_grupo = NEW.id_grupo and id_planilha = NEW.id_e and nro_linha = NEW.nro_linha_e;
                 else 
-                    update nfe_det_trade set saldo = saldo - NEW.qtd_e where id_grupo = NEW.id_grupo and id_planilha = NEW.id_e and nro_linha = NEW.nro_linha_e;
+                    update nfe_det_trade set saldo = saldo - NEW.qtd_e                 where id_grupo = NEW.id_grupo and id_planilha = NEW.id_e and nro_linha = NEW.nro_linha_e;
                 end if;
            end if;
            RETURN NEW;
