@@ -194,20 +194,20 @@ namespace Trade_GP
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(265, 35);
+            this.label3.Location = new System.Drawing.Point(319, 37);
             this.label3.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(114, 17);
+            this.label3.Size = new System.Drawing.Size(44, 17);
             this.label3.TabIndex = 21;
-            this.label3.Text = "Filtro De CFOP ?";
+            this.label3.Text = "Ação:";
             // 
             // cbCPFO
             // 
             this.cbCPFO.FormattingEnabled = true;
             this.cbCPFO.ItemHeight = 16;
             this.cbCPFO.Items.AddRange(new object[] {
-            "SOMENTE SAIDAS 5405",
-            "TODOS MOV. MENOS 5405"});
+            "GERAR ACUMUlADO 5405",
+            "IMPORTAR NOTAS"});
             this.cbCPFO.Location = new System.Drawing.Point(387, 32);
             this.cbCPFO.Margin = new System.Windows.Forms.Padding(4);
             this.cbCPFO.Name = "cbCPFO";

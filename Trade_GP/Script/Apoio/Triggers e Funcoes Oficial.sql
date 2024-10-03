@@ -41,16 +41,17 @@
         _saldo_f := _saldo_s;
         _qtd     := 0;
         _hoje    := CURRENT_DATE;
-        _data    := Date '2017-02-28';
+        //_data    := Date '2017-02-28';
         //_last    := _hoje  - interval '4 years 11 months';
+        _last      := _data  - interval '3 years';
         //Processando as entradas
         FOR entrada in  
            SELECT *
            FROM NFE_DET_TRADE ENT
            WHERE  ENT.id_grupo = _id_grupo and ENT.cod_emp = _cod_empresa and ENT.local = _local and ENT.material = _material and 
                   ((ENT.dt_ref >= '2017-03-01' AND ENT.id_operacao = 'E' AND ENT.cof_vlr > 0 AND ENT.saldo > 0) OR (ENT.dt_ref <= '2017-02-28' AND ENT.id_operacao = 'E' AND ENT.cof_vlr > 0 AND ENT.saldo_inicial > 0)) 
-                  and ( ENT.dt_ref <= _data)
-           ORDER BY ENT.cod_emp,ENT.local,ENT.material,ENT.id_operacao,ENT.dt_ref asc
+                  and ( ENT.dt_ref >= _LAST AND ENT.dt_ref <= _data)
+           ORDER BY ENT.cod_emp,ENT.local,ENT.material,ENT.id_operacao,ENT.dt_ref desc
         LOOP     
            
                //RAISE NOTICE 'ENTRADA.cod_empresa % ENTRADA.local % ENTRADA.material % ENTRADA.dtlanc % ENTRADA.qtd % ENTRADA.saldo % ENTRADA.status %', entrada.cod_empresa,entrada.local,entrada.material,entrada.dtlanc,entrada.qtd, entrada.saldo, entrada.status;
@@ -142,16 +143,17 @@
         _saldo_f := _saldo_s;
         _qtd     := 0;
         _hoje    := CURRENT_DATE;
-        _data    := Date '2017-02-28';
+        //_data    := Date '2017-02-28';
         //_last    := _hoje  - interval '4 years 11 months';
+        _last    := _data  - interval '3 years';
         //Processando as entradas
         FOR entrada in  
            SELECT *
            FROM NFE_DET_TRADE ENT
            WHERE  ENT.id_grupo = _id_grupo and ENT.cod_emp = _cod_empresa and ENT.local = _local and ENT.material = _material and 
                   ((ENT.dt_ref >= '2017-03-01' AND ENT.id_operacao = 'e' AND ENT.saldo > 0) OR (ENT.dt_ref <= '2017-02-28' AND ENT.id_operacao = 'e'  AND ENT.saldo_inicial > 0)) 
-                  and ( ENT.dt_ref <= _data)
-           ORDER BY ENT.cod_emp,ENT.local,ENT.material,ENT.id_operacao,ENT.dt_ref asc
+                  and ( ENT.dt_ref >= _LAST AND ENT.dt_ref <= _data)
+           ORDER BY ENT.cod_emp,ENT.local,ENT.material,ENT.id_operacao,ENT.dt_ref desc
         LOOP     
            
                //RAISE NOTICE 'ENTRADA.cod_empresa % ENTRADA.local % ENTRADA.material % ENTRADA.dtlanc % ENTRADA.qtd % ENTRADA.saldo % ENTRADA.status %', entrada.cod_empresa,entrada.local,entrada.material,entrada.dtlanc,entrada.qtd, entrada.saldo, entrada.status;
@@ -471,6 +473,7 @@
      
           SELECT *
           FROM   saldo_inicial SLD
+          INNER JOIN resumo_5405 resumo on resumo.id_grupo = sld.id_grupo and resumo.cod_emp = sld.cod_emp and resumo.local = sld.local and resumo.material = sld.material
           WHERE  SLD.id_grupo = _id_grupo and SLD.cod_emp = _cod_emp and SLD.local = _local and SLD.status = '0' 
           ORDER BY SLD.id_grupo,SLD.cod_emp,SLD.local,SLD.material limit 300
 

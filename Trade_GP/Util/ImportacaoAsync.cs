@@ -27,7 +27,7 @@ namespace Trade_GP.Util
 
         public static List<ContDetProc> lsMoviDets = new List<ContDetProc>(); // Lista para armazenar detalhes de movimentação
 
-        public static DateTime Data_Implantacao_Saldo = DateTime.Parse("28/02/2017"); 
+        public static DateTime Data_Implantacao_Saldo = DateTime.Parse("28/02/2017");
 
         //public static string FiltroCFOP = "1000#1100#1101#1102#1111#1116#1117#1118#1120#1121#1122#1150#1151#1152#1201#1202#1203#1204#1208#1209#1401#1403#1408#1409#1410#1411#1949#2000#2100#2101#2102#2111#2113#2116#2117#2118#2120#2121#2122#2150#2151#2152#2153#2154#2200#2201#2202#2203#2204#2208#2209#2401#2403#2408#2409#2410#2411#2949#5100#5101#5102#5103#5104#5105#5106#5109#5110#5111#5112#5113#5114#5115#5116#5117#5118#5119#5120#5122#5123#5124#5125#5150#5151#5152#5200#5201#5202#5208#5209#5400#5401#5402#5403#5405#5408#5409#5410#5411#5949#6000#6100#6101#6102#6103#6104#6105#6106#6107#6108#6109#6110#6111#6112#6113#6114#6115#6116#6117#6118#6119#6120#6122#6123#6124#6125#6150#6151#6152#6155#6156#6200#6201#6202#6208#6209#6400#6401#6402#6403#6404#6408#6409#6410#6411#6949";
 
@@ -36,9 +36,9 @@ namespace Trade_GP.Util
 
 
         public static string FiltroCFOPTodas = "1#2#3#5#6#7";
-        public static string FiltroCFOP5405     = "5405";
+        public static string FiltroCFOP5405 = "5405";
 
-        public static List<string> materiais = new List<string>();
+        public static List<Resumo_5405_01> materiais = new List<Resumo_5405_01>();
 
 
         /*
@@ -77,45 +77,47 @@ namespace Trade_GP.Util
 
             Boolean loadMaterais = false;
 
+            Resumo_5405_01 material = new Resumo_5405_01();
+
             await Task.Run(async () =>
             {
-            using (StreamReader file = new StreamReader(fullName))
-            {
-                while (((line = file.ReadLine()) != null))
+                using (StreamReader file = new StreamReader(fullName))
                 {
-                    if (StaticLsErrosImportacao.Count > 5)
+                    while (((line = file.ReadLine()) != null))
                     {
-                        ImportacaoAsync.StaticLsErrosImportacao.Add(new ErrosImportacao("E", fileName, "", "", "", 0, "Excesso De Erros No Arquivo"));
-                        break;
-                    }
+                        if (StaticLsErrosImportacao.Count > 5)
+                        {
+                            ImportacaoAsync.StaticLsErrosImportacao.Add(new ErrosImportacao("E", fileName, "", "", "", 0, "Excesso De Erros No Arquivo"));
+                            break;
+                        }
 
-                    report.Mensagem = $"Lendo E Gravando {ContadorLinhas.ToString("N0")}";
+                        report.Mensagem = $"Lendo E Gravando {ContadorLinhas.ToString("N0")}";
 
-                    report.PercentageComplete = 0;
+                        report.PercentageComplete = 0;
 
-                    progress.Report(report);
+                        progress.Report(report);
 
-                    if (ContadorLinhas == 0)
-                    {
-                        ContadorLinhas++;
+                        if (ContadorLinhas == 0)
+                        {
+                            ContadorLinhas++;
 
-                        Console.WriteLine(line);
+                            Console.WriteLine(line);
 
-                        continue;
+                            continue;
 
-                    }
-
-
-                    fields.Clear();
-
-                    fields.AddRange(line.Split(';').ToList());
+                        }
 
 
-                    if (fields.Count != 51 && fields.Count != 52)
-                    {
-                        ImportacaoAsync.StaticLsErrosImportacao.Add(new ErrosImportacao("E", fileName, $"{ContadorLinhas}", "", "", fields.Count, $"{line}"));
+                        fields.Clear();
 
-                        break;
+                        fields.AddRange(line.Split(';').ToList());
+
+
+                        if (fields.Count != 51 && fields.Count != 52)
+                        {
+                            ImportacaoAsync.StaticLsErrosImportacao.Add(new ErrosImportacao("E", fileName, $"{ContadorLinhas}", "", "", fields.Count, $"{line}"));
+
+                            break;
 
                         }
                         else
@@ -136,7 +138,7 @@ namespace Trade_GP.Util
 
                             if (filtroCfop == "TODAS" && materiais.Count() == 0)
                             {
-                                ImportacaoAsync.StaticLsErrosImportacao.Add(new ErrosImportacao("E", fileName,"", "", "",0,"Para Esta Operação Preciso Do Resumo De Materais!"));
+                                ImportacaoAsync.StaticLsErrosImportacao.Add(new ErrosImportacao("E", fileName, "", "", "", 0, "Para Esta Operação Preciso Do Resumo De Materais!"));
 
                                 break;
                             }
@@ -158,12 +160,13 @@ namespace Trade_GP.Util
                                     ImportacaoAsync.StaticLsErrosImportacao.Add(new ErrosImportacao("E", fileName, $"{ContadorLinhas}", "cod_emp-local", "", 0, $"Cliente {cod_emp} {local} Não Cadastrado!"));
                                     break;
                                 }
-                                                               
+
                                 Cabecalho.Layout = fields.Count == 51 ? "S" : "C";
 
                                 if (ContadorLinhas == 1)
                                 {
-                                    if (Cabecalho.Id == 0) {
+                                    if (Cabecalho.Id == 0)
+                                    {
                                         daoNfeCabTrade daoCabec = new daoNfeCabTrade();
 
                                         NfeCabTrade Cabec = daoCabec.Insert(Cabecalho);
@@ -179,9 +182,10 @@ namespace Trade_GP.Util
                                     }
                                 }
                             }
-                                                                                   
 
-                            if (!(ItsOK(fields[12], filtroCfop))) {
+
+                            if (!(ItsOK(fields[12], filtroCfop)))
+                            {
 
                                 ContadorLinhas++;
 
@@ -196,7 +200,7 @@ namespace Trade_GP.Util
                                     Console.WriteLine("Em Branco");
                                 }
 
-                                var achou = materiais.FirstOrDefault(material => material.Trim() == fields[15].Trim());
+                                var achou = materiais.FirstOrDefault(mat => mat.material.Trim() == fields[15].Trim());
 
                                 if (achou == null)
                                 {
@@ -204,76 +208,108 @@ namespace Trade_GP.Util
 
                                     continue;
                                 }
+
+                                material = achou;
                             }
 
                             NfeDetTrade Det = new NfeDetTrade(); // Lembre-se de inicializá-lo conforme necessário
 
-                            populalsMoviDet(fields, fileName, ContadorLinhas);
+                            populalsMoviDet(fields, fileName, ContadorLinhas,material);
                             populalsMoviDets(fields, fileName, ContadorLinhas, lsMoviDets);
 
-                            if (filtroCfop == "5405") {
+                            if (filtroCfop == "5405")
+                            {
 
                                 daoResumo5405 daoresumo = new daoResumo5405();
-                                Resumo_5405 resumo      = new Resumo_5405()
+                                Resumo_5405 resumo = new Resumo_5405()
                                 {
                                     id_grupo = 1,
                                     cod_emp = lsMoviDet[lsMoviDet.Count - 1].Cod_Emp,
                                     local = lsMoviDet[lsMoviDet.Count - 1].Local,
-                                    material = lsMoviDet[lsMoviDet.Count - 1].Material
+                                    material = lsMoviDet[lsMoviDet.Count - 1].Material,
+                                    unid = lsMoviDet[lsMoviDet.Count - 1].Unid
                                 };
 
-                                daoresumo.Update(resumo);
+                                daoresumo.UpdateX(resumo);
 
+                                if (lsMoviDets.Count() == Page)
+                                {
+                                    lsMoviDets.Clear();
+                                }
+                            }
+                            else
+                            {
+
+                                if (lsMoviDet.Count() == Page)
+                                {
+                                    await MultInsertAsyncMOVI_DET();
+                                    lsMoviDet.Clear();
+                                }
+
+                                if (lsMoviDets.Count() == Page)
+                                {
+                                    await MultInsertAsyncMOVI_DETs();
+                                    lsMoviDets.Clear();
+                                }
+                            }
+
+                            ContadorLinhas++;
+
+                        }
+                        //Grava a sobra do  while
+
+                        if (lsMoviDet.Count() > 0)
+                        {
+                            if (filtroCfop == "5405")
+                            {
+                                daoResumo5405 daoresumo = new daoResumo5405();
+                                Resumo_5405 resumo = new Resumo_5405()
+                                {
+                                    id_grupo = 1,
+                                    cod_emp = lsMoviDet[lsMoviDet.Count - 1].Cod_Emp,
+                                    local = lsMoviDet[lsMoviDet.Count - 1].Local,
+                                    material = lsMoviDet[lsMoviDet.Count - 1].Material,
+                                    unid = lsMoviDet[lsMoviDet.Count - 1].Unid
+                                };
+
+                                daoresumo.UpdateX(resumo);
+
+                                lsMoviDets.Clear();
+
+                            } else
+                            {
+                                await MultInsertAsyncMOVI_DET();
+
+                                lsMoviDet.Clear();
                             }
                         }
 
-                        if (lsMoviDet.Count() == Page)
+                        if (lsMoviDets.Count() > 0)
                         {
-                            await MultInsertAsyncMOVI_DET();
-                            lsMoviDet.Clear();
+                            if (filtroCfop == "5405")
+                            {
+                                await MultInsertAsyncMOVI_DETs();
+
+                                lsMoviDets.Clear();
+                            } else
+                            {
+                                await MultInsertAsyncMOVI_DETs();
+
+                                lsMoviDets.Clear();
+                            }
                         }
 
-                        if (lsMoviDets.Count() == Page)
-                        {
-                            await MultInsertAsyncMOVI_DETs();
-                            lsMoviDets.Clear();
-                        }
-
-                        ContadorLinhas++;
-
-                      
-
+                        Console.WriteLine($"TOTAL DE LINHAS: {ImportacaoAsync.lsMoviDet.Count}");
+                        Console.WriteLine($"TOTAL DE LINHAS: {ImportacaoAsync.lsMoviDets.Count}");
                     }
 
-                    //Grava a sobra do  while
-
-                    if (lsMoviDet.Count() > 0)
-                    {
-
-                        await MultInsertAsyncMOVI_DET();
-
-                        lsMoviDet.Clear();
-
-                    }
-
-                    if (lsMoviDets.Count() > 0)
-                    {
-
-                        await MultInsertAsyncMOVI_DETs();
-
-                        lsMoviDets.Clear();
-
-                    }
-
-                    Console.WriteLine($"TOTAL DE LINHAS: {ImportacaoAsync.lsMoviDet.Count}");
-                    Console.WriteLine($"TOTAL DE LINHAS: {ImportacaoAsync.lsMoviDets.Count}");
                 }
             });
         }
 
-        private static void populalsMoviDet(List<string> fields,string fileName, int ContadorLinhas)
+        private static void populalsMoviDet(List<string> fields, string fileName, int ContadorLinhas, Resumo_5405_01 material )
         {
-           
+
             try
             {
                 NfeDetTrade Det = new NfeDetTrade();
@@ -282,22 +318,23 @@ namespace Trade_GP.Util
                 Det.Id_Planilha = Cabecalho.Id;
                 Det.Id_Operacao = "Z";
                 Det.Nro_Linha = ContadorLinhas;
-                Det.Cod_Emp = fields[00].MaxLength(fileName, ContadorLinhas, "Cod_Emp",6);
-                Det.Local = fields[01].MaxLength(fileName, ContadorLinhas, "Local", 6); 
-                Det.Id_Parc = fields[02].MaxLength(fileName, ContadorLinhas, "Id_Parc", 15); 
-                Det.Cnpj_Cpf = fields[03].LimpaCnpjCpf().MaxLength(fileName, ContadorLinhas, "Cnpj_Cpf", 14); 
+                Det.Cod_Emp = fields[00].MaxLength(fileName, ContadorLinhas, "Cod_Emp", 6);
+                Det.Local = fields[01].MaxLength(fileName, ContadorLinhas, "Local", 6);
+                Det.Id_Parc = fields[02].MaxLength(fileName, ContadorLinhas, "Id_Parc", 15);
+                Det.Cnpj_Cpf = fields[03].LimpaCnpjCpf().MaxLength(fileName, ContadorLinhas, "Cnpj_Cpf", 14);
                 Det.Nome = "";
-                Det.UF = fields[05].MaxLength(fileName, ContadorLinhas, "UF", 02); 
+                Det.UF = fields[05].MaxLength(fileName, ContadorLinhas, "UF", 02);
                 Det.Chave_Acesso = fields[06].MaxLength(fileName, ContadorLinhas, "Chave_Acesso", 44);
                 Det.Nro_Doc = fields[07].MaxLength(fileName, ContadorLinhas, "Nro_Doc", 20);
                 Det.Nro_Item = fields[08].MaxLength(fileName, ContadorLinhas, "Nro_Item", 15);
                 Det.Nro_Posicao = fields[09].MaxLength(fileName, ContadorLinhas, "Nro_Posicao", 10);
                 try
                 {
-                   Det.Dt_Doc =  DateTime.ParseExact(fields[10],
-                                                             "dd/MM/yyyy",
-                                                             CultureInfo.InvariantCulture);
-                } catch (Exception ex)
+                    Det.Dt_Doc = DateTime.ParseExact(fields[10],
+                                                              "dd/MM/yyyy",
+                                                              CultureInfo.InvariantCulture);
+                }
+                catch (Exception ex)
                 {
                     ImportacaoAsync.StaticLsErrosImportacao.Add(new ErrosImportacao("E", fileName, $"{ContadorLinhas}", "Dt_Lanc", fields[10], 0, $"Converção Inválida!"));
                 }
@@ -323,7 +360,7 @@ namespace Trade_GP.Util
                     {
                         Det.Dt_Ref = Det.Dt_Doc;
                     }
-                   
+
                 }
                 catch (Exception ex)
                 {
@@ -331,11 +368,11 @@ namespace Trade_GP.Util
                 }
                 Det.Origem = fields[13].MaxLength(fileName, ContadorLinhas, "Origem", 1);
                 Det.Sit_Trib = fields[14].MaxLength(fileName, ContadorLinhas, "Sit_Trib", 2);
-                if ( (fields[15] is null) || (fields[15].ToUpper() == "NULL")) fields[15] = "";
+                if ((fields[15] is null) || (fields[15].ToUpper() == "NULL")) fields[15] = "";
                 Det.Material = fields[15].MaxLength(fileName, ContadorLinhas, "Material", 20);
                 Det.Tp_Aval = fields[16].MaxLength(fileName, ContadorLinhas, "Tp_Aval", 15);
                 Det.Cod_Controle = fields[17].MaxLength(fileName, ContadorLinhas, "Cod_Controle", 15);
-                Det.Denom = fields[18].MaxLength(fileName, ContadorLinhas, "Denon", 120).Replace("'","''");
+                Det.Denom = fields[18].MaxLength(fileName, ContadorLinhas, "Denon", 120).Replace("'", "''");
                 Det.Unid = fields[19].MaxLength(fileName, ContadorLinhas, "Unid", 5);
                 Det.Quantidade_1 = fields[20].DoubleParseUSAError(fileName, "Quantidade_1", ContadorLinhas);
                 Det.Quantidade_2 = fields[21].DoubleParseUSAError(fileName, "Quantidade_2", ContadorLinhas);
@@ -345,7 +382,7 @@ namespace Trade_GP.Util
                 Det.Valor = fields[25].DoubleParseUSAError(fileName, "Valor", ContadorLinhas); ;
                 Det.Vlr_Contb = fields[26].DoubleParseUSAError(fileName, "Vlr_Contb", ContadorLinhas); ;
                 Det.PIS_Base = fields[27].DoubleParseUSAError(fileName, "PIS_Base", ContadorLinhas); ;
-                Det.StPis = fields[28].MaxLength(fileName, ContadorLinhas, "StPis", 2); 
+                Det.StPis = fields[28].MaxLength(fileName, ContadorLinhas, "StPis", 2);
                 Det.Pis_Taxa = fields[29].DoubleParseUSAError(fileName, "Pis_Taxa", ContadorLinhas); ;
                 Det.Pis_Vlr = fields[30].DoubleParseUSAError(fileName, "Pis_Vlr", ContadorLinhas); ;
                 Det.StCof = fields[31].MaxLength(fileName, ContadorLinhas, "StCof", 2);
@@ -376,28 +413,30 @@ namespace Trade_GP.Util
                 Det.Id_Saida = 0;
                 Det.Nro_Linha_Saida = 0;
                 Det.Id_Operacao = getOperacao(Det);
-
+                Det.Qtd_Convertida = (Det.Quantidade_1 * material.fator);
+                Det.Fator = material.fator;
                 lsMoviDet.Add(Det);
 
                 Cabecalho.Qtd += Det.Quantidade_1;
-                Cabecalho.Vlr_Contabil  += Det.Vlr_Contb;
-                Cabecalho.Bas_Icms      += Det.Icms_Base;
-                Cabecalho.Vlr_Icms      += Det.Icms_Vlr;
-                Cabecalho.Bas_Pis       += Det.PIS_Base;
-                Cabecalho.Vlr_Pis       += Det.Pis_Vlr;
-                Cabecalho.Bas_Cof       += Det.Cof_Base;
-                Cabecalho.Vlr_Cof       += Det.Cof_Vlr;
-                Cabecalho.Bas_Ipi       += Det.Ipi_Base;
-                Cabecalho.Vlr_Ipi       += Det.Ipi_Vlr;
-                Cabecalho.Bas_Icms_st   += Det.Icst_Base;
-                Cabecalho.Vlr_Icms_st   += Det.Icst_Valor;
+                Cabecalho.Vlr_Contabil += Det.Vlr_Contb;
+                Cabecalho.Bas_Icms += Det.Icms_Base;
+                Cabecalho.Vlr_Icms += Det.Icms_Vlr;
+                Cabecalho.Bas_Pis += Det.PIS_Base;
+                Cabecalho.Vlr_Pis += Det.Pis_Vlr;
+                Cabecalho.Bas_Cof += Det.Cof_Base;
+                Cabecalho.Vlr_Cof += Det.Cof_Vlr;
+                Cabecalho.Bas_Ipi += Det.Ipi_Base;
+                Cabecalho.Vlr_Ipi += Det.Ipi_Vlr;
+                Cabecalho.Bas_Icms_st += Det.Icst_Base;
+                Cabecalho.Vlr_Icms_st += Det.Icst_Valor;
                 Cabecalho.NroLinha = Cabecalho.NroLinha + 1;
 
-            } catch( Exception ex)
+            }
+            catch (Exception ex)
             {
                 throw new Exception(ex.Message);
             }
-            
+
         }
 
         private static void populalsMoviDets(List<string> fields, string fileName, int ContadorLinhas, List<ContDetProc> lsMoviDets)
@@ -427,7 +466,7 @@ namespace Trade_GP.Util
 
         public static async Task MultInsertAsyncMOVI_DET()
         {
-            
+
             ProgressReportModel report = new ProgressReportModel();
 
             int Contador = 0;
@@ -501,7 +540,9 @@ namespace Trade_GP.Util
                                         "qtd_dev,           " +
                                         "Id_Saida,          " +
                                         "Nro_Linha_Saida,    " +
-                                        "Saldo_Inicial      " +
+                                        "Saldo_Inicial  ,    " +
+                                        "qtd_convertida   ,   " +
+                                        "fator      " +
                                         "   ) " +
                                         " VALUES ";
 
@@ -519,9 +560,10 @@ namespace Trade_GP.Util
                             Virgula = "";
 
                         }
+
                         try
                         {
-                            StringInsert += Virgula + "(" + 
+                            StringInsert += Virgula + "(" +
                                                         $"  {Cabecalho.Id_Grupo} ," +
                                                             $"  {Cabecalho.Id} ," +
                                                             $" '{obj.Id_Operacao}'," +
@@ -581,10 +623,12 @@ namespace Trade_GP.Util
                                                             $"  {obj.Sobra.DoubleParseDb()}," +
                                                             $" '{obj.Status}', " +
                                                             $" '{obj.Layout}'," +
-                                                            $"  {obj.Qtd_Dev.DoubleParseDb()}, "+
+                                                            $"  {obj.Qtd_Dev.DoubleParseDb()}, " +
                                                             $"  {obj.Id_Saida}, " +
                                                             $"  {obj.Nro_Linha_Saida} , " +
-                                                            $"  {obj.Saldo_Inicial}  " +
+                                                            $"  {obj.Saldo_Inicial.DoubleParseDb()} , " +
+                                                            $"  {obj.Qtd_Convertida.DoubleParseDb()} , " +
+                                                            $"  {obj.Fator.DoubleParseDb()}  " +
                                                             " ) ";
 
 
@@ -622,7 +666,7 @@ namespace Trade_GP.Util
                     }
                 }
         );
-           
+
         }
 
         public static async Task MultInsertAsyncMOVI_DETs()
@@ -845,7 +889,7 @@ namespace Trade_GP.Util
 
                     }
 
-                   
+
                 }
             });
         }
@@ -861,12 +905,13 @@ namespace Trade_GP.Util
 
             if (filtroCfop == "TODAS")
             {
-                if (cfop.Substring(0,4) == "5405")
+                if (cfop.Substring(0, 4) == "5405")
                 {
 
                     retorno = false;
 
-                } else
+                }
+                else
                 {
                     retorno = (FiltroCFOPTodas.Contains(cfop.Substring(0, 1)));
                 }
@@ -890,17 +935,18 @@ namespace Trade_GP.Util
 
                 retorno = "E";
 
-                if ( !((det.Doc_Origem.Trim() == "0") || (det.Doc_Origem.Trim() == "")))
+                if (!((det.Doc_Origem.Trim() == "0") || (det.Doc_Origem.Trim() == "")))
                 {
                     if (((det.Icst_Valor + det.Fest_Valor) == 0) && (det.Sit_Trib == "6"))
                     {
-                        retorno =  "Z";
+                        retorno = "Z";
                     }
                     else
                     {
                         retorno = "z";
                     }
-                } else
+                }
+                else
                 {
                     if ((det.Icst_Valor + det.Fest_Valor) > 0)
                     {
@@ -934,11 +980,12 @@ namespace Trade_GP.Util
                     {
                         retorno = "s";
                     }
-                } else
+                }
+                else
                 {
                     retorno = "s";
                 }
-                
+
             }
 
             return retorno;

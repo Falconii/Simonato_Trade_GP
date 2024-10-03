@@ -127,7 +127,9 @@ CREATE TABLE public.Nfe_Det_Trade  (
             qtd_dev numeric(15,4) NOT NULL ,
             id_saida  int4 NOT NULL,
             nro_linha_saida  int4 NOT NULL,
-            saldo_inicial numeric(15,4) NOT NULL ,
+            saldo_inicial   numeric(15,4) NOT NULL ,
+            qtd_convertida  numeric(15,4) NOT NULL ,
+            fator           numeric(06,2) NOT NULL ,
  	PRIMARY KEY(id_grupo,id_planilha,nro_linha)
 )
 WITHOUT OIDS 
@@ -410,11 +412,32 @@ CREATE TABLE public.resumo_5405  (
     id_grupo       int4 NOT NULL,
     cod_emp        varchar(6) NOT NULL, 
     local          varchar(6) NOT NULL,
-	material       char(15) NOT NULL,
+	material       varchar(15) NOT NULL,
+    unid           char(05) NOT NULL,
+    fator          numeric(06,2) NOT NULL ,
 	PRIMARY KEY(id_grupo,cod_emp,local,material)
 )
 WITHOUT OIDS 
 TABLESPACE "Producao"
 GO
+
+
+DROP TABLE IF EXISTS DE_PARA;
+CREATE TABLE public.de_para  ( 
+    id_grupo         int4 NOT NULL,
+    cod_emp          varchar(6) NOT NULL, 
+    local            varchar(6) NOT NULL,
+	de_material      char(15) NOT NULL,
+    de_unid          char(10) NOT NULL,
+    de_descricao     char(150) NOT NULL,
+	para_material    char(15) NOT NULL,
+    para_unid        char(10) NOT NULL,
+    para_descricao   char(150) NOT NULL,
+	PRIMARY KEY(id_grupo,cod_emp,local,de_material,para_material)
+)
+WITHOUT OIDS 
+TABLESPACE "Producao"
+GO
+
 
 

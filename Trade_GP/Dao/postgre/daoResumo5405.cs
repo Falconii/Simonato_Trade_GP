@@ -14,8 +14,8 @@ namespace Trade_GP.Dao.postgre
         {
             Resumo_5405 retorno = null;
 
-            String StringInsert = $"insert into resumo_5405(id_grupo, cod_emp, local, material) " +
-                                  $"values({obj.id_grupo}, '{obj.cod_emp}', '{obj.local}', '{obj.material}') RETURNING  * ";
+            String StringInsert = $"insert into resumo_5405(id_grupo, cod_emp, local, material, unid, fator) " +
+                                  $"values({obj.id_grupo}, '{obj.cod_emp}', '{obj.local}', '{obj.material}','{obj.unid}',{obj.fator}) RETURNING  * ";
             try
             {
 
@@ -65,7 +65,7 @@ namespace Trade_GP.Dao.postgre
 
         }
 
-        public Resumo_5405 Update(Resumo_5405 obj)
+        public Resumo_5405 UpdateX(Resumo_5405 obj)
         {
 
             Resumo_5405 resumo = this.Seek(obj);
@@ -83,6 +83,29 @@ namespace Trade_GP.Dao.postgre
             }
 
             return obj;
+        }
+
+        public void Update(Resumo_5405 obj)
+        {
+
+            String StringUpdate = $" UPDATE resumo_5405 SET " +
+                    $"  UNID = {obj.unid }  " +
+                    $", FATOR = {obj.fator} " +
+                    $"  where id_gupo = { obj.id_grupo} " +
+                    $"  and cod_emp = '{obj.cod_emp}' and local = '{obj.local}' and material = '{obj.material}'; ";
+            Console.WriteLine(StringUpdate);
+
+            try
+            {
+
+                DataBase.RunCommand.CreateCommand(StringUpdate);
+
+            }
+            catch (ExceptionErroImportacao ex)
+            {
+                MessageBox.Show(ex.Message, "Atenção!");
+            }
+
         }
 
         public void Delete(Resumo_5405 obj)
@@ -148,20 +171,35 @@ namespace Trade_GP.Dao.postgre
                 id_grupo = Convert.ToInt16(objDataReader["id_grupo"]),
                 cod_emp = objDataReader["cod_emp"].ToString(),
                 local = objDataReader["local"].ToString(),
-                material = objDataReader["material"].ToString()
+                material = objDataReader["material"].ToString(),
+                unid = objDataReader["unid"].ToString(),
+                fator = Convert.ToDouble(objDataReader["fator"])
             };
 
             return obj;
         }
 
-        public List<string> getAll(int id_grupo, string cod_emp, string local)
+        private Resumo_5405_01 PopulaResumo_01(NpgsqlDataReader objDataReader)
         {
 
-            List<string> lista = new List<string>();
+            var obj = new Resumo_5405_01
+            {
+                material = objDataReader["material"].ToString(),
+                unid = objDataReader["unid"].ToString(),
+                fator = Convert.ToDouble(objDataReader["fator"])
+            };
+
+            return obj;
+        }
+
+        public List<Resumo_5405_01> getAll(int id_grupo, string cod_emp, string local)
+        {
+
+            List<Resumo_5405_01> lista = new List<Resumo_5405_01>();
 
             string strStringConexao = DataBase.RunCommand.connectionString;
 
-            string strSelect = SqlGrid( id_grupo,  cod_emp,  local);
+            string strSelect = SqlGrid(id_grupo, cod_emp, local);
 
             Console.WriteLine(strSelect);
 
@@ -180,10 +218,9 @@ namespace Trade_GP.Dao.postgre
 
                             while (objDataReader.Read())
                             {
+                                var obj = PopulaResumo_01(objDataReader);
 
-                                string mat = objDataReader["material"].ToString();
-
-                                lista.Add(mat);
+                                lista.Add(obj);
 
                             }
                         }
@@ -209,7 +246,7 @@ namespace Trade_GP.Dao.postgre
 
             string OrderBy = "";
 
-            string strSelect = "select  material from resumo_5405 ";
+            string strSelect = "select  material, unid, fator from resumo_5405 ";
 
             Where = $"WHERE  id_grupo = {id_grupo} and cod_emp = '{cod_emp}' and local = '{local}'  ";
 
