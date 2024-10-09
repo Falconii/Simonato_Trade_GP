@@ -399,7 +399,9 @@ CREATE TABLE public.saldo_inicial  (
     local            varchar(6) NOT NULL,
 	material         char(15) NOT NULL,
 	saldo_inicial    numeric(15,4) NOT NULL ,
-    saldo_implantado numeric(15,4) NOT NULL ,
+    saldo_ini_conv   numeric(15,4) NOT NULL ,
+    saldo_imp_conv   numeric(15,4) NOT NULL ,
+    fator            numeric(06,2) NOT NULL ,
     status           char(1) NOT NULL,
 	PRIMARY KEY(id_grupo,cod_emp,local,material)
 )

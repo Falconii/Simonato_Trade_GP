@@ -406,6 +406,7 @@ namespace Trade_GP.Util
                 Det.Doc_Origem = fields[49].MaxLength(fileName, ContadorLinhas, "Doc_Origem", 20);
                 Det.Item_Ref = fields[50].MaxLength(fileName, ContadorLinhas, "Item_Ref", 15).IntParse().ToString();
                 Det.Saldo = fields[20].DoubleParseUSAError(fileName, "Saldo", ContadorLinhas);
+                Det.Saldo = Det.Saldo * material.fator;
                 Det.Sobra = 0;
                 Det.Status = "0";
                 Det.Layout = fields.Count == 51 ? "S" : "C";

@@ -451,14 +451,25 @@
     $BODY$;
 
 
-
+   DROP TYPE IF EXISTS Reg_Saldo;
+    CREATE TYPE Reg_Saldo AS 
+    (
+        id_grupo    int4,
+        cod_emp     text,
+        local       text,
+        material    text,
+        saldo_ini_conv numeric(15,4),
+        saldo_imp_conv numeric(15,4),
+        alternativo    text
+    );
+    
     CREATE OR REPLACE FUNCTION "public"."calculo_saldo_inicial" (in _id_grupo int4, in _cod_emp text, in _local text , in _id_fechamento int, out _saida int) 
     RETURNS int
     AS
     $$
     DECLARE
 
-    tempo    public.saldo_inicial%ROWTYPE;
+    tempo    public.Reg_Saldo%ROWTYPE;
 
     __saldo_f     numeric(15,4);
 
@@ -471,29 +482,50 @@
 
       FOR tempo in  
      
-          SELECT *
+          SELECT    sld.id_grupo         as id_grupo,
+                    sld.cod_emp          as cod_emp,
+                    sld.local            as local,
+                    sld.material         as material,
+                    sld.saldo_ini_conv   as saldo_ini_conv ,
+                    sld.saldo_imp_conv   as saldo_imp_conv,
+                    coalesce(depara.para_material,'') as alternativo
           FROM   saldo_inicial SLD
           INNER JOIN resumo_5405 resumo on resumo.id_grupo = sld.id_grupo and resumo.cod_emp = sld.cod_emp and resumo.local = sld.local and resumo.material = sld.material
+          LEFT  JOIN de_para     depara on depara.id_grupo = sld.id_grupo and depara.cod_emp = sld.cod_emp and depara.local = sld.local and depara.de_material = sld.material
           WHERE  SLD.id_grupo = _id_grupo and SLD.cod_emp = _cod_emp and SLD.local = _local and SLD.status = '0' 
           ORDER BY SLD.id_grupo,SLD.cod_emp,SLD.local,SLD.material limit 300
 
           LOOP      
-      
+          
                  _status = '0';
              
-                 select _saldo_f from seek_entrada_saldo(tempo.id_grupo,tempo.cod_emp,tempo.local,tempo.material,tempo.saldo_inicial,_id_fechamento) into __saldo_f ;
+                 select _saldo_f from seek_entrada_saldo(tempo.id_grupo,tempo.cod_emp,tempo.local,tempo.material,tempo.saldo_ini_conv,_id_fechamento) into __saldo_f ;
             
                  if (__saldo_f = 0) then
                     _status = '1';
                  else    
-                     if (__saldo_f = tempo.saldo_inicial) then
+                     if (__saldo_f = tempo.saldo_ini_conv) then
                        _status := '3';
                      else 
                        _status := '2';
                      end if;
                  end if;
-             
-                 update saldo_inicial set status = _status, saldo_implantado = saldo_inicial - __saldo_f  where id_grupo = tempo.id_grupo and cod_emp = tempo.cod_emp and local = tempo.local and material = tempo.material;
+         
+                 if ((__saldo_f > 0) and (tempo.alternativo != '')) then
+                 
+                     select _saldo_f from seek_entrada_saldo(tempo.id_grupo,tempo.cod_emp,tempo.local,tempo.alternativo,__saldo_f,_id_fechamento) into __saldo_f ;
+                     if (__saldo_f = 0) then
+                        _status = '1';
+                     else    
+                         if (__saldo_f = tempo.saldo_ini_conv) then
+                           _status := '3';
+                         else 
+                           _status := '2';
+                         end if;
+                     end if;
+                 end if;
+         
+                 update saldo_inicial set status = _status, saldo_imp_conv = saldo_ini_conv - __saldo_f  where id_grupo = tempo.id_grupo and cod_emp = tempo.cod_emp and local = tempo.local and material = tempo.material;
              
                  _saida := _saida + 1;
 
@@ -507,14 +539,44 @@
     go
 
     /*
-    select * from calculo_saldo_inicial(1,'1004','0001',1)
+    
+    select * from public.resumo_5405 where local = '0002'
 
-    select sld.*,ent.nro_doc,ent.material,ent.quantidade_1,ent.saldo,con.qtd_e,(ent.quantidade_1 - ent.saldo) as saldo_inicial, ent.saldo_inicial
+//Update para atualizar os saldos com fator de conversão
+UPDATE  saldo_inicial sld
+        SET  saldo_ini_conv = saldo_inicial * resumo.fator, fator = resumo.fator 
+        FROM resumo_5405 resumo 
+        WHERE   resumo.id_grupo = sld.id_grupo and resumo.cod_emp = sld.cod_emp and resumo.local = sld.local and resumo.material = sld.material
+
+select * from saldo_inicial where local = '0002' and fator <> 0
+
+select * from de_para
+
+update saldo_inicial set status = '0', saldo_imp_conv = 0
+
+select * from 
+   
+    saldo_imp_conv
+    
+    saldo_imp_conv
+            
+    select * from public.nfe_det_trade where material = '1096594'
+    
+    
+    select * from calculo_saldo_inicial(1,'1004','0002',1)
+     
+    select sld.*,ent.nro_doc,ent.material,coalesce(depara.para_material,'') as alternativo,ent.quantidade_1,ent.qtd_convertida,ent.saldo,con.qtd_e, ent.saldo as restante ,ent.saldo_inicial as saldo_inicial
     from   saldo_inicial sld
     inner join controle_s con on con.id_grupo = sld.id_grupo and con.id_fechamento = 1 and con.cod_emp = sld.cod_emp and con.local = sld.local and con.material = sld.material
-    inner join nfe_det_trade  ent on ent.id_grupo = sld.id_grupo and ent.id_planilha = con.id_e and ent.nro_linha = con.nro_linha_e
-    where  sld.id_grupo = 1 and sld.cod_emp = '1004' and sld.local = '0001'
+    inner join nfe_det_trade  ent    on ent.id_grupo = sld.id_grupo and ent.id_planilha = con.id_e and ent.nro_linha = con.nro_linha_e
+    left  join de_para        depara on depara.id_grupo = sld.id_grupo and depara.cod_emp = sld.cod_emp and depara.local = sld.local and depara.de_material = sld.material
+    where  sld.id_grupo = 1 and sld.cod_emp = '1004' and sld.local = '0002'
     order by ent.dt_ref,ent.nro_doc,sld.material
+    
+    
+    select * from controle_s
+    
+    
     */
 
     DROP TYPE IF EXISTS Sai_Dev;
