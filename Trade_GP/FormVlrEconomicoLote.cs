@@ -124,7 +124,7 @@ namespace Trade_GP
 
             status_inical();
 
-            var parametros = new FormParametros();
+            var parametros = new FormParametros("3");
 
             var Result = parametros.ShowDialog();
 
@@ -153,11 +153,13 @@ namespace Trade_GP
 
             string[] mes_ano = periodo.Split('/');
 
-            int ultimoDia = DateTime.DaysInMonth(mes_ano[1].IntParse(), mes_ano[0].IntParse());
+            int primeiroDia = (mes_ano[1] == "2017" && mes_ano[0] == "03") ? 16 : 1; 
+
+            int ultimoDia   = DateTime.DaysInMonth(mes_ano[1].IntParse(), mes_ano[0].IntParse());
 
             lsTarefas.Clear();
 
-            for (int dia = 1; dia <= ultimoDia; dia++)
+            for (int dia = primeiroDia; dia <= ultimoDia; dia++)
             {
                 var  hoje = new DateTime(mes_ano[1].IntParse(), mes_ano[0].IntParse(), dia);
 
@@ -330,7 +332,10 @@ namespace Trade_GP
                     foreach (var mes in lsMeses)
                     {
 
-                        
+                        if (mes.Registros == 0)
+                        {
+                           // continue;
+                        }
                         
                         NewTarefas(mes.Mes);
                                        
@@ -447,15 +452,15 @@ namespace Trade_GP
                 {
                     if (cbTipoProcessamento.SelectedIndex == 0)
                     {
-                        _saida = await daoDet.Vlr_Economico_V2(UsuarioSistema.Id_Grupo, cod_emp, local, Periodo, anoSelic, mesSeleic);
+                        _saida = await daoDet.Vlr_Economico_V3(UsuarioSistema.Id_Grupo, cod_emp, local, Periodo, anoSelic, mesSeleic);
                     }
                     if (cbTipoProcessamento.SelectedIndex == 1)
                     {
-                        _saida = await daoDet.vlr_enconomico_c(UsuarioSistema.Id_Grupo, cod_emp, local, Periodo, anoSelic, mesSeleic);
+                        //_saida = await daoDet.vlr_enconomico_c(UsuarioSistema.Id_Grupo, cod_emp, local, Periodo, anoSelic, mesSeleic);
                     }
                     if (cbTipoProcessamento.SelectedIndex == 2)
                     {
-                        _saida = await daoDet.atualizacao_selic(UsuarioSistema.Id_Grupo, cod_emp, local, Periodo, anoSelic, mesSeleic);
+                        //_saida = await daoDet.atualizacao_selic(UsuarioSistema.Id_Grupo, cod_emp, local, Periodo, anoSelic, mesSeleic);
                     }
                 }
                 catch (Exception ex)

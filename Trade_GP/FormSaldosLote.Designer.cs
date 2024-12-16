@@ -71,9 +71,9 @@ namespace Trade_GP
             this.gbParametros.Controls.Add(this.btParametros);
             this.gbParametros.Controls.Add(this.btProximo);
             this.gbParametros.Location = new System.Drawing.Point(8, 58);
-            this.gbParametros.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.gbParametros.Margin = new System.Windows.Forms.Padding(4);
             this.gbParametros.Name = "gbParametros";
-            this.gbParametros.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.gbParametros.Padding = new System.Windows.Forms.Padding(4);
             this.gbParametros.Size = new System.Drawing.Size(287, 151);
             this.gbParametros.TabIndex = 64;
             this.gbParametros.TabStop = false;
@@ -82,8 +82,8 @@ namespace Trade_GP
             // btParametros
             // 
             this.btParametros.BackColor = System.Drawing.Color.Red;
-            this.btParametros.Location = new System.Drawing.Point(20, 43);
-            this.btParametros.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.btParametros.Location = new System.Drawing.Point(8, 49);
+            this.btParametros.Margin = new System.Windows.Forms.Padding(4);
             this.btParametros.Name = "btParametros";
             this.btParametros.Size = new System.Drawing.Size(193, 28);
             this.btParametros.TabIndex = 7;
@@ -95,7 +95,7 @@ namespace Trade_GP
             // 
             this.btProximo.ForeColor = System.Drawing.Color.Green;
             this.btProximo.Location = new System.Drawing.Point(144, 103);
-            this.btProximo.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.btProximo.Margin = new System.Windows.Forms.Padding(4);
             this.btProximo.Name = "btProximo";
             this.btProximo.Size = new System.Drawing.Size(133, 28);
             this.btProximo.TabIndex = 6;
@@ -107,7 +107,7 @@ namespace Trade_GP
             // 
             this.dbLocais.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dbLocais.Location = new System.Drawing.Point(303, 60);
-            this.dbLocais.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.dbLocais.Margin = new System.Windows.Forms.Padding(4);
             this.dbLocais.Name = "dbLocais";
             this.dbLocais.RowHeadersWidth = 51;
             this.dbLocais.Size = new System.Drawing.Size(952, 154);
@@ -123,9 +123,9 @@ namespace Trade_GP
             this.gbMensaProcessamento.Controls.Add(this.pgProcesso);
             this.gbMensaProcessamento.Controls.Add(this.btProcessar);
             this.gbMensaProcessamento.Location = new System.Drawing.Point(1263, 60);
-            this.gbMensaProcessamento.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.gbMensaProcessamento.Margin = new System.Windows.Forms.Padding(4);
             this.gbMensaProcessamento.Name = "gbMensaProcessamento";
-            this.gbMensaProcessamento.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.gbMensaProcessamento.Padding = new System.Windows.Forms.Padding(4);
             this.gbMensaProcessamento.Size = new System.Drawing.Size(536, 151);
             this.gbMensaProcessamento.TabIndex = 66;
             this.gbMensaProcessamento.TabStop = false;
@@ -154,7 +154,7 @@ namespace Trade_GP
             // pgProcesso
             // 
             this.pgProcesso.Location = new System.Drawing.Point(8, 47);
-            this.pgProcesso.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.pgProcesso.Margin = new System.Windows.Forms.Padding(4);
             this.pgProcesso.Name = "pgProcesso";
             this.pgProcesso.Size = new System.Drawing.Size(537, 28);
             this.pgProcesso.TabIndex = 1;
@@ -162,9 +162,9 @@ namespace Trade_GP
             // btProcessar
             // 
             this.btProcessar.Location = new System.Drawing.Point(265, 116);
-            this.btProcessar.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.btProcessar.Margin = new System.Windows.Forms.Padding(4);
             this.btProcessar.Name = "btProcessar";
-            this.btProcessar.Size = new System.Drawing.Size(280, 28);
+            this.btProcessar.Size = new System.Drawing.Size(263, 28);
             this.btProcessar.TabIndex = 0;
             this.btProcessar.Tag = "0";
             this.btProcessar.Text = "Processamento";
@@ -173,6 +173,8 @@ namespace Trade_GP
             // 
             // lblCancelamentoAtivado
             // 
+            this.lblCancelamentoAtivado.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.lblCancelamentoAtivado.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblCancelamentoAtivado.ForeColor = System.Drawing.Color.Red;
             this.lblCancelamentoAtivado.Location = new System.Drawing.Point(8, 236);
@@ -190,7 +192,7 @@ namespace Trade_GP
             this.dbMeses.CausesValidation = false;
             this.dbMeses.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dbMeses.Location = new System.Drawing.Point(8, 294);
-            this.dbMeses.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.dbMeses.Margin = new System.Windows.Forms.Padding(4);
             this.dbMeses.Name = "dbMeses";
             this.dbMeses.RowHeadersWidth = 51;
             this.dbMeses.Size = new System.Drawing.Size(656, 245);
@@ -225,7 +227,7 @@ namespace Trade_GP
             this.dtGridLog.CausesValidation = false;
             this.dtGridLog.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dtGridLog.Location = new System.Drawing.Point(696, 294);
-            this.dtGridLog.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.dtGridLog.Margin = new System.Windows.Forms.Padding(4);
             this.dtGridLog.Name = "dtGridLog";
             this.dtGridLog.RowHeadersWidth = 51;
             this.dtGridLog.Size = new System.Drawing.Size(1103, 245);
@@ -245,7 +247,7 @@ namespace Trade_GP
             this.Controls.Add(this.dbLocais);
             this.Controls.Add(this.gbParametros);
             this.Controls.Add(this.lblTitulo);
-            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "FormSaldosLote";
             this.Text = "Saldos Lote Diário";
             this.Activated += new System.EventHandler(this.FormSaldosLote_Activated);

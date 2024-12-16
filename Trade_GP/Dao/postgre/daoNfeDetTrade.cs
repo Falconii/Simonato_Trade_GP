@@ -673,6 +673,58 @@ namespace Trade_GP.Dao.postgre
 
         }
 
+        public async Task<int> Vlr_Economico_V3(int id_grupo, string cod_emp, string local, string periodo, int ano_selic, int mes_selic)
+        {
+
+            int _saida = 0;
+
+            String StringProc = $"select * from vlr_enconomico_V3({id_grupo},'{cod_emp}','{local}','{periodo}', {ano_selic},{mes_selic}) ";
+
+            string strStringConexao = DataBase.RunCommand.connectionString;
+
+            await Task.Run(() =>
+            {
+                using (var objConexao = new NpgsqlConnection(strStringConexao))
+                {
+                    using (var objCommand = new NpgsqlCommand(StringProc, objConexao))
+                    {
+                        try
+                        {
+                            objConexao.Open();
+
+                            var objDataReader = objCommand.ExecuteReader();
+
+                            if (objDataReader.HasRows)
+                            {
+
+                                while (objDataReader.Read())
+                                {
+
+                                    _saida = Convert.ToInt32(objDataReader["_saida"]);
+
+                                }
+                            }
+
+                        }
+                        catch (Exception ex)
+                        {
+                            MessageBox.Show(ex.Message, "Atenção!");
+
+                            _saida = -1;
+                        }
+                        finally
+                        {
+                            objConexao.Dispose();
+                        }
+                    }
+                }
+
+            });
+
+            return _saida;
+
+        }
+
         public async Task<int> atualizacao_selic(int id_grupo, string cod_emp, string local, string periodo, int ano_selic, int mes_selic)
         {
 

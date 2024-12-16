@@ -12,20 +12,23 @@ namespace Trade_GP.Models
         public string cod_emp { get; set; }
         public string local { get; set; }
         public string material { get; set; }
+        public string descricao { get; set; }
         public string unid { get; set; }
         public double fator { get; set; }
 
         public Resumo_5405()
         {
+            this.Zerar();
         }
 
-        public Resumo_5405(int id_grupo, string cod_emp, string local, string material, string unid)
+        public Resumo_5405(int id_grupo, string cod_emp, string local, string material, string descricao, string unid)
         {
-            this.id_grupo = id_grupo;
-            this.cod_emp = cod_emp;
-            this.local = local;
-            this.material = material;
-            this.unid = unid;
+            this.id_grupo   = id_grupo;
+            this.cod_emp    = cod_emp;
+            this.local      = local;
+            this.material   = material;
+            this.descricao  = descricao;
+            this.unid  = unid;
             this.fator = 0;
         }
 
@@ -35,6 +38,7 @@ namespace Trade_GP.Models
             this.cod_emp = "";
             this.local = "";
             this.material = "";
+            this.descricao = "";
             this.unid = "";
             this.fator = 0;
         }

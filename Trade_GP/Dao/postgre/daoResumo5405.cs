@@ -14,8 +14,8 @@ namespace Trade_GP.Dao.postgre
         {
             Resumo_5405 retorno = null;
 
-            String StringInsert = $"insert into resumo_5405(id_grupo, cod_emp, local, material, unid, fator) " +
-                                  $"values({obj.id_grupo}, '{obj.cod_emp}', '{obj.local}', '{obj.material}','{obj.unid}',{obj.fator}) RETURNING  * ";
+            String StringInsert = $"insert into resumo_5405(id_grupo, cod_emp, local, material, descricao, unid, fator) " +
+                                  $"values({obj.id_grupo}, '{obj.cod_emp}', '{obj.local}', '{obj.material}','{obj.descricao}','{obj.unid}',{obj.fator}) RETURNING  * ";
             try
             {
 
@@ -172,6 +172,7 @@ namespace Trade_GP.Dao.postgre
                 cod_emp = objDataReader["cod_emp"].ToString(),
                 local = objDataReader["local"].ToString(),
                 material = objDataReader["material"].ToString(),
+                descricao = objDataReader["descricao"].ToString(),
                 unid = objDataReader["unid"].ToString(),
                 fator = Convert.ToDouble(objDataReader["fator"])
             };
@@ -184,8 +185,9 @@ namespace Trade_GP.Dao.postgre
 
             var obj = new Resumo_5405_01
             {
-                material = objDataReader["material"].ToString(),
-                unid = objDataReader["unid"].ToString(),
+                material   = objDataReader["material"].ToString(),
+                descricao  = objDataReader["descricao"].ToString(),
+                unid  = objDataReader["unid"].ToString(),
                 fator = Convert.ToDouble(objDataReader["fator"])
             };
 
@@ -246,7 +248,7 @@ namespace Trade_GP.Dao.postgre
 
             string OrderBy = "";
 
-            string strSelect = "select  material, unid, fator from resumo_5405 ";
+            string strSelect = "select  material, descricao , unid, fator from resumo_5405 ";
 
             Where = $"WHERE  id_grupo = {id_grupo} and cod_emp = '{cod_emp}' and local = '{local}'  ";
 

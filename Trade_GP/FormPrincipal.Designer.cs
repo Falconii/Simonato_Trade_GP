@@ -204,7 +204,6 @@ namespace Trade_GP
             this.toolStripMenuItem2.Name = "toolStripMenuItem2";
             this.toolStripMenuItem2.Size = new System.Drawing.Size(327, 26);
             this.toolStripMenuItem2.Text = "Cálculo Valor Econômico Por Lote";
-            this.toolStripMenuItem2.Visible = false;
             this.toolStripMenuItem2.Click += new System.EventHandler(this.toolStripMenuItem2_Click);
             // 
             // atualizaçãoVrlEconômicoSELICToolStripMenuItem

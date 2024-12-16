@@ -322,42 +322,43 @@ namespace Trade_GP
                     foreach (var mes in lsMeses)
                     {
 
-                        NewTarefas(mes.Mes);
 
-
-
-                        resultado = await processamento(UsuarioSistema.Id_Grupo, par.Cod_Emp, par.Local);
-
-                        if (Cancelar)
+                        if (mes.Registros > 0)
                         {
+                            NewTarefas(mes.Mes);
 
-                            //   DialogResult resposta = MessageBox.Show("Processamento Cancelado. Deseja Encerrar O Processamento ?", "Atenção!",
-                            //   MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
-                            //   if (resposta == DialogResult.Yes)
-                            //    {
+                            resultado = await processamento(UsuarioSistema.Id_Grupo, par.Cod_Emp, par.Local);
 
-                            //FechamentoOficial.DtFinal = DateTime.Now;
-                            //FechamentoOficial.Status = "1";
+                            if (Cancelar)
+                            {
 
-                            //daoFechamento dao = new daoFechamento();
+                                //   DialogResult resposta = MessageBox.Show("Processamento Cancelado. Deseja Encerrar O Processamento ?", "Atenção!",
+                                //   MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+                                //   if (resposta == DialogResult.Yes)
+                                //    {
 
-                            //dao.Update(FechamentoOficial);
+                                //FechamentoOficial.DtFinal = DateTime.Now;
+                                //FechamentoOficial.Status = "1";
+
+                                //daoFechamento dao = new daoFechamento();
+
+                                //dao.Update(FechamentoOficial);
 
 
 
 
-                            //   }
+                                //   }
 
 
-                            //    lblCancelamentoAtivado.Text = "Cancelamento Executado!";
+                                //    lblCancelamentoAtivado.Text = "Cancelamento Executado!";
 
-                            //   status_processado();
+                                //   status_processado();
 
-                            //    break;
-                            // }
+                                //    break;
+                                // }
 
+                            }
                         }
-
                     }
                 }
 

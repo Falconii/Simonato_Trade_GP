@@ -263,11 +263,13 @@ CREATE TABLE public.controle_e  (
     id_fechamento   int4 NOT NULL,
 	id_s          	int4 NOT NULL,
     nro_linha_s     int4 NOT NULL,
+    seq             serial NOT NULL,
 	id_e          	int4 NOT NULL,
     nro_linha_e     int4 NOT NULL,
     qtd_s           numeric(15,4) NULL,
 	qtd_e   	    numeric(15,4) NULL,
     qtd_d           numeric(15,4) NULL,
+    sld_dev         numeric(15,4) NULL,
     flag            char(1) default ' ',
 	PRIMARY KEY(id_grupo,id_fechamento,id_s,nro_linha_s,id_e,nro_linha_e)
 )
@@ -323,7 +325,8 @@ CREATE TABLE public.nfe_det_trade_val  (
 	vlr_economico_pis_corrigido   	numeric(18,4) NULL,
 	vlr_economico_cofins_corrigido	numeric(18,4) NULL,
 	taxa                          	numeric(7,2) NULL,
-    qtd_sld_anterior                numeric(15,4) NULL,
+    Icms_St_Unit                    numeric(15,4) NULL,
+    qtd_calculada                   numeric(15,4) NULL,
 	usuarioinclusao               	int4 NULL,
 	usuarioatualizacao            	int4 NULL,
 	PRIMARY KEY(id_grupo,id,nro_linha,id_planilha_entrada,nro_linha_entrada)
@@ -398,10 +401,12 @@ CREATE TABLE public.saldo_inicial  (
     cod_emp          varchar(6) NOT NULL, 
     local            varchar(6) NOT NULL,
 	material         char(15) NOT NULL,
+    descricao        varchar(100)  NOT NULL,
 	saldo_inicial    numeric(15,4) NOT NULL ,
     saldo_ini_conv   numeric(15,4) NOT NULL ,
     saldo_imp_conv   numeric(15,4) NOT NULL ,
     fator            numeric(06,2) NOT NULL ,
+    ct               int4 NOT NULL,
     status           char(1) NOT NULL,
 	PRIMARY KEY(id_grupo,cod_emp,local,material)
 )
@@ -415,6 +420,7 @@ CREATE TABLE public.resumo_5405  (
     cod_emp        varchar(6) NOT NULL, 
     local          varchar(6) NOT NULL,
 	material       varchar(15) NOT NULL,
+    descricao      varchar(150) NOT NULL,
     unid           char(05) NOT NULL,
     fator          numeric(06,2) NOT NULL ,
 	PRIMARY KEY(id_grupo,cod_emp,local,material)

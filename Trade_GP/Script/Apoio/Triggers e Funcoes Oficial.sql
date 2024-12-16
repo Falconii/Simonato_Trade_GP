@@ -37,24 +37,28 @@
     _hoje    date;
 
     BEGIN
+    
+        
+        RAISE NOTICE 'seek_in_2v1';
+
 
         _saldo_f := _saldo_s;
         _qtd     := 0;
         _hoje    := CURRENT_DATE;
         //_data    := Date '2017-02-28';
         //_last    := _hoje  - interval '4 years 11 months';
-        _last      := _data  - interval '3 years';
+        _last      := _data  - interval '6 months';
         //Processando as entradas
         FOR entrada in  
            SELECT *
            FROM NFE_DET_TRADE ENT
            WHERE  ENT.id_grupo = _id_grupo and ENT.cod_emp = _cod_empresa and ENT.local = _local and ENT.material = _material and 
-                  ((ENT.dt_ref >= '2017-03-01' AND ENT.id_operacao = 'E' AND ENT.cof_vlr > 0 AND ENT.saldo > 0) OR (ENT.dt_ref <= '2017-02-28' AND ENT.id_operacao = 'E' AND ENT.cof_vlr > 0 AND ENT.saldo_inicial > 0)) 
+                  ((ENT.dt_ref >= '2017-03-01' AND ENT.id_operacao = 'E' AND ENT.cof_vlr > 0 AND ENT.saldo > 0) OR (ENT.dt_ref <= '2017-02-28' AND ENT.id_operacao = 'X' AND ENT.cof_vlr > 0 AND ENT.saldo_inicial > 0)) 
                   and ( ENT.dt_ref >= _LAST AND ENT.dt_ref <= _data)
-           ORDER BY ENT.cod_emp,ENT.local,ENT.material,ENT.id_operacao,ENT.dt_ref desc
+           ORDER BY ENT.cod_emp,ENT.local,ENT.material,ENT.id_operacao desc,ENT.dt_ref desc
         LOOP     
            
-               //RAISE NOTICE 'ENTRADA.cod_empresa % ENTRADA.local % ENTRADA.material % ENTRADA.dtlanc % ENTRADA.qtd % ENTRADA.saldo % ENTRADA.status %', entrada.cod_empresa,entrada.local,entrada.material,entrada.dtlanc,entrada.qtd, entrada.saldo, entrada.status;
+               //RAISE NOTICE 'ENTRADA.cod_empresa % ENTRADA.local % ENTRADA.material % ENTRADA.dtlanc % ENTRADA.qtd % ENTRADA.saldo % ENTRADA.status %', entrada.cod_emp,entrada.local,entrada.material,entrada.dtlanc,entrada.qtd, entrada.saldo, entrada.status;
 
                //RAISE NOTICE '_id_grupo % _id_s  % _nro_linha_s % _cod_empresa % _local % _material  % _data  % _saldo_s % ', _id_grupo,_id_s,_nro_linha_s,_cod_empresa,_local,_material,_data,_saldo_s;
 
@@ -115,7 +119,7 @@
 
     */
 
-    CREATE OR REPLACE FUNCTION "public"."seek_in_2v2"(
+ CREATE OR REPLACE FUNCTION "public"."seek_in_2v2"(
     in  _id_grupo     int4,
     in  _id_s         int4,
     in  _nro_linha_s  int4,
@@ -145,15 +149,17 @@
         _hoje    := CURRENT_DATE;
         //_data    := Date '2017-02-28';
         //_last    := _hoje  - interval '4 years 11 months';
-        _last    := _data  - interval '3 years';
+        _last    := _data  - interval '6 months';
+        
+        RAISE NOTICE ' _saldo_f % ',_saldo_f;
         //Processando as entradas
         FOR entrada in  
            SELECT *
            FROM NFE_DET_TRADE ENT
            WHERE  ENT.id_grupo = _id_grupo and ENT.cod_emp = _cod_empresa and ENT.local = _local and ENT.material = _material and 
-                  ((ENT.dt_ref >= '2017-03-01' AND ENT.id_operacao = 'e' AND ENT.saldo > 0) OR (ENT.dt_ref <= '2017-02-28' AND ENT.id_operacao = 'e'  AND ENT.saldo_inicial > 0)) 
+                  ((ENT.dt_ref >= '2017-03-01' AND ENT.id_operacao = 'e' AND ENT.saldo > 0) OR (ENT.dt_ref <= '2017-02-28' AND ENT.id_operacao = 'x'  AND ENT.saldo_inicial > 0)) 
                   and ( ENT.dt_ref >= _LAST AND ENT.dt_ref <= _data)
-           ORDER BY ENT.cod_emp,ENT.local,ENT.material,ENT.id_operacao,ENT.dt_ref desc
+           ORDER BY ENT.cod_emp,ENT.local,ENT.material,ENT.id_operacao desc,ENT.dt_ref desc
         LOOP     
            
                //RAISE NOTICE 'ENTRADA.cod_empresa % ENTRADA.local % ENTRADA.material % ENTRADA.dtlanc % ENTRADA.qtd % ENTRADA.saldo % ENTRADA.status %', entrada.cod_empresa,entrada.local,entrada.material,entrada.dtlanc,entrada.qtd, entrada.saldo, entrada.status;
@@ -208,183 +214,26 @@
     LANGUAGE 'plpgsql'
     go
 
+   DROP TYPE IF EXISTS fields_entrada;
+   CREATE TYPE fields_entrada AS 
+    (
+	    id_grupo        int4,
+        id_planilha     int4,
+        nro_linha       int4,
+		id_operacao     text,
+		cod_emp         text,
+		local           text,
+		material        text,     
+		dt_ref          date,
+		saldo           numeric(15,4),
+		quantidade_1    numeric(15,4),
+		id_saida        int4,
+		nro_linha_saida int4,
+		qtd_convertida  numeric(15,4),
+		alternativo     text
+    );
 
-    drop function seek_entrada_saldo;
-    CREATE OR REPLACE FUNCTION "public"."seek_entrada_saldo"(
-    in  _id_grupo     int4,
-    in  _cod_empresa  text,
-    in  _local        text,
-    in  _material     text,
-    in  _saldo_s      numeric(15,4),
-    in  _id_fechamento int4,
-    out _saldo_f      numeric(15,4)
-    ) 
-    RETURNS numeric(15,4)
-    AS
-    $$
-    DECLARE
-
-    entrada  public.nfe_det_trade%ROWTYPE;
-    _saldo_e numeric(15,4);
-    _qtd     numeric(15,4);
-    _last    date;
-    _hoje    date;
-    _data    date;
-
-    BEGIN
-
-        _saldo_f := _saldo_s;
-        _qtd     := 0;
-        _hoje    := CURRENT_DATE;
-        _data    := Date '2017-02-28';
-        //_last    := _hoje  - interval '4 years 11 months';
-        //Processando as entradas
-        FOR entrada in  
-           SELECT *
-           FROM NFE_DET_TRADE ENT
-           WHERE  ENT.id_grupo = _id_grupo and ENT.cod_emp = _cod_empresa and ENT.local = _local and ENT.material = _material and (ENT.id_operacao = 'E' OR ENT.id_operacao = 'e' OR ENT.id_operacao = 'X' OR ENT.id_operacao = 'x') and (ENT.saldo > 0) and ( ENT.dt_ref <= _data)
-           ORDER BY ENT.cod_emp,ENT.local,ENT.material,ENT.id_operacao,ENT.dt_ref desc
-        LOOP     
-           
-               //RAISE NOTICE 'ENTRADA.cod_empresa % ENTRADA.local % ENTRADA.material % ENTRADA.dtlanc % ENTRADA.qtd % ENTRADA.saldo % ENTRADA.status %', entrada.cod_empresa,entrada.local,entrada.material,entrada.dtlanc,entrada.qtd, entrada.saldo, entrada.status;
-
-               // NOTICE '_id_grupo % _id_s  % _nro_linha_s % _cod_empresa % _local % _material  % _data  % _saldo_s % ', _id_grupo,_id_fechamento,_cod_empresa,_local,_material,_data,_saldo_s;
-
-               _saldo_e := entrada.saldo;
-
-               //Tratamento
-               IF (_saldo_s >= _saldo_e) THEN
-
-                   _qtd     := _saldo_e;
-
-                   _saldo_s := _saldo_s - _saldo_e;
-
-                   _saldo_e :=  0;
-
-               ELSE 
-
-                  _qtd      := _saldo_s;
-
-                  _saldo_e  := _saldo_e - _saldo_s;
-
-                  _saldo_s  := 0; 
-
-               END IF;
-
-               _saldo_f := _saldo_s;
-
-              //Atualiza nota e
-              //é feito atraves da trigger do controle_s
-              //update nfe_det_trade set saldo = _saldo_e where id_grupo = entrada.id_grupo and id_planilha = entrada.id_planilha and nro_linha = entrada.nro_linha;
-          
-          
-              INSERT INTO controle_s(id_grupo,id_fechamento,cod_emp,local,material,id_e, nro_linha_e, qtd_e ,qtd_s) VALUES(_id_grupo,_id_fechamento,_cod_empresa, _local,_material, entrada.id_planilha , entrada.nro_linha, _qtd ,_saldo_f);
-          
-
-              IF (_saldo_f = 0) THEN
-
-                  return;
-
-              END IF;
-
-        END LOOP;
-
-    END;
-    $$
-    LANGUAGE 'plpgsql'
-    go
-
-
-    /*
-
-       função seek_saida_2
-
-       usada na função calculo_saldo
-
-
-    */ 
-    CREATE OR REPLACE FUNCTION "public"."seek_saida_2"(
-    in  _id_grupo      int4,
-    in  _cod_empresa   text,
-    in  _local         text,
-    in  _id_d          int4,
-    in  _nro_linha_d   int4,
-    in  _material_d    text,
-    in  _qtd_d         numeric(15,4),
-    in  _dt_ref_d      date,
-    in  _id_s          int4,
-    in  _nro_linha_s   int4,
-    in  _id_fechamento int4,
-    out _saldo_f       numeric(15,4)
-    ) 
-    RETURNS numeric(15,4)
-    AS
-    $$
-    DECLARE
-
-    controle  public.controle_e%ROWTYPE;
-    _saldo_e numeric(15,4);
-    _qtd_abatida numeric(15,4);
-    _last    date;
-    _hoje    date;
-
-    BEGIN
-
-        _saldo_f = 0;
-
-        //RAISE NOTICE  'seek_saida_2 _id_grupo % - _cod_empresa % - _local % - _id_d  % - _nro_linha_d   % -_m aterial_d % - _qtd_d % - _dt_ref_d  % - _id_s  % - _nro_linha_s   % - _id_fechamento % ',
-         //              _id_grupo  , _cod_empresa , _local , _id_d  , _nro_linha_d   ,_material_d , _qtd_d , _dt_ref_d  , _id_s  , _nro_linha_s   , _id_fechamento   ;
-
-        _qtd_abatida := _qtd_d;
-
-         FOR controle in  
-     
-          SELECT *
-          FROM   controle_e CONTROL 
-          WHERE  CONTROL.id_grupo = _id_grupo and CONTROL.id_fechamento = _id_fechamento and CONTROL.id_s = _id_s and CONTROL.nro_linha_s = _nro_linha_s
-          ORDER BY  CONTROL.id_grupo , CONTROL.id_fechamento , CONTROL.id_s , CONTROL.nro_linha_s 
-          LOOP      
-
-              //RAISE NOTICE  'ID_S % - NRO_LINHA_S % QTD % ', controle.id_s, controle.nro_linha_s, controle.qtd_e;
-
-              IF (_qtd_abatida > 0 ) THEN 
-
-                    IF ( _qtd_abatida >= controle.qtd_e ) THEN
-
-                        UPDATE controle_e set qtd_e = 0 where id_grupo = _id_grupo and id_fechamento = _id_fechamento and id_s = _id_s and nro_linha_s = _nro_linha_s;
-
-                        _qtd_abatida := _qtd_abatida - controle.qtd_e;
-
-                    ELSE
-
-                       UPDATE controle_e set qtd_e = qtd_e - _qtd_abatida  where id_grupo = _id_grupo and id_fechamento = _id_fechamento and id_s = _id_s and nro_linha_s = _nro_linha_s;
-
-                        _qtd_abatida := 0;
-
-                   END IF;
-
-             END IF;
-          END LOOP;
-          INSERT INTO controle_e(id_grupo,id_fechamento,id_s, nro_linha_s, id_e, nro_linha_e, qtd_s, qtd_e, qtd_d,flag) 	
-            VALUES(_id_grupo,_id_fechamento,_id_s, _nro_linha_s,_id_d , _nro_linha_d, 0, 0 , _qtd_d, 'D');
-      
-    END;
-    $$
-    LANGUAGE 'plpgsql'
-    go
-
-
-    /*
-
-      Calculo do saldo de estoque
-
-      24/05/2024
-
-    */
-    -- FUNCTION: public.calculo_saldov2(integer, text, text, text, integer)
-
-    -- DROP FUNCTION IF EXISTS public.calculo_saldov2(integer, text, text, text, integer);
-
+   DROP FUNCTION IF EXISTS public.calculo_saldov2(integer, text, text, text, integer);
     CREATE OR REPLACE FUNCTION public.calculo_saldov2(
 	    _id_grupo integer,
 	    _cod_emp text,
@@ -399,7 +248,7 @@
     AS $BODY$
     DECLARE
 
-    tempo    public.nfe_det_trade%ROWTYPE;
+    tempo    fields_entrada%ROWTYPE;
 
     __saldo_f     numeric(15,4);
 
@@ -409,12 +258,26 @@
 
       FOR tempo in  
      
-          SELECT *
+        SELECT  det.id_grupo	,   
+                det.id_planilha	,   
+                det.nro_linha	,   
+                det.id_operacao ,
+                det.cod_emp	,       
+                det.local,	       
+                det.material,	   
+                det.dt_ref	,       
+                det.saldo	,       
+                det.quantidade_1,
+                det.id_saida,	   
+                det.nro_linha_saida,
+                det.qtd_convertida,
+                coalesce(depara.para_material,'') as alternativo
           FROM   nfe_det_trade DET
+          LEFT  JOIN de_para     depara on depara.id_grupo = det.id_grupo and depara.cod_emp = det.cod_emp and depara.local = det.local and depara.de_material = det.material
           WHERE  DET.id_grupo = _id_grupo and DET.cod_emp = _cod_emp and Det.local = _local and 
                  ( ( ((det.id_operacao = 'S') OR (det.id_operacao = 's')) and det.status = '0'  ) OR (det.id_operacao = 'Z' and det.status = '0'))
                  and (TO_CHAR(det.dt_ref,'DD/MM/YYYY') = _mes_ano)  
-          ORDER BY DET.id_grupo,DET.cod_emp,DET.local,DET.dt_ref,DET.nro_doc,DET.nro_item 
+          ORDER BY DET.id_grupo,DET.cod_emp,DET.local,DET.id_operacao desc,DET.dt_ref,DET.nro_doc,DET.nro_item 
 
           LOOP      
              
@@ -424,19 +287,59 @@
                IF (tempo.id_operacao = 'Z') then
  
                
-                   select _saldo_f from seek_saida_2(tempo.id_grupo,tempo.cod_emp,tempo.local,tempo.id_planilha,tempo.nro_linha,tempo.material,tempo.quantidade_1,tempo.dt_ref,tempo.id_saida,tempo.nro_linha_saida,_id_fechamento) into __saldo_f ;
+                   select _saldo_f from seek_saida_2(tempo.id_grupo,tempo.cod_emp,tempo.local,tempo.id_planilha,tempo.nro_linha,tempo.material,tempo.qtd_convertida,tempo.dt_ref,tempo.id_saida,tempo.nro_linha_saida,_id_fechamento) into __saldo_f ;
                    update nfe_det_trade set status = '1' where id_grupo = tempo.id_grupo and id_planilha = tempo.id_planilha and nro_linha = tempo.nro_linha;
 
                else 
 
                   if (tempo.id_operacao = 'S') then
 
+                      //RAISE NOTICE 'tempo.material % tempo.dt_ref % tempo.saldo %',tempo.material , tempo.dt_ref , tempo.saldo;
+                      
                       select _saldo_f from seek_in_2V1(tempo.id_grupo,tempo.id_planilha,tempo.nro_linha,tempo.cod_emp,tempo.local,tempo.material,tempo.dt_ref,tempo.saldo,_id_fechamento) into __saldo_f ;
+
+                      if (__saldo_f > 0  and tempo.alternativo <> '') then 
+                      
+                         select _saldo_f from seek_in_2V1(tempo.id_grupo,tempo.id_planilha,tempo.nro_linha,tempo.cod_emp,tempo.local,tempo.alternativo,tempo.dt_ref,__saldo_f,_id_fechamento) into __saldo_f ;
+
+                      end if;
+
+                      select __saldo_f from seek_in_2V2(tempo.id_grupo,tempo.id_planilha,tempo.nro_linha,tempo.cod_emp,tempo.local,tempo.material,tempo.dt_ref,tempo.saldo,_id_fechamento) into __saldo_f ;
+                      
+                      if (__saldo_f > 0  and tempo.alternativo <> '') then 
+
+                         select _saldo_f from seek_in_2V2(tempo.id_grupo,tempo.id_planilha,tempo.nro_linha,tempo.cod_emp,tempo.local,tempo.alternativo,tempo.dt_ref,__saldo_f,_id_fechamento) into __saldo_f ;
+
+                      end if;
+
                       update nfe_det_trade set saldo = __saldo_f , status = '1' where id_grupo = tempo.id_grupo and id_planilha = tempo.id_planilha and nro_linha = tempo.nro_linha;
 
                   else 
+                  
+                     
+                      //RAISE NOTICE 'Passei 002';
+                      
+                      
+                      //RAISE NOTICE 'tempo.material % tempo.dt_ref % tempo.saldo %',tempo.material , tempo.dt_ref , tempo.saldo;
+                  
                       select _saldo_f from seek_in_2V2(tempo.id_grupo,tempo.id_planilha,tempo.nro_linha,tempo.cod_emp,tempo.local,tempo.material,tempo.dt_ref,tempo.saldo,_id_fechamento) into __saldo_f ;
+                      
+                       if (__saldo_f > 0  and tempo.alternativo <> '') then 
+
+                         select _saldo_f from seek_in_2V2(tempo.id_grupo,tempo.id_planilha,tempo.nro_linha,tempo.cod_emp,tempo.local,tempo.alternativo,tempo.dt_ref,__saldo_f,_id_fechamento) into __saldo_f ;
+
+                      end if;
+
+                      select __saldo_f from seek_in_2V1(tempo.id_grupo,tempo.id_planilha,tempo.nro_linha,tempo.cod_emp,tempo.local,tempo.material,tempo.dt_ref,tempo.saldo,_id_fechamento) into __saldo_f ;
+
+                      if (__saldo_f > 0  and tempo.alternativo <> '') then 
+                      
+                         select _saldo_f from seek_in_2V1(tempo.id_grupo,tempo.id_planilha,tempo.nro_linha,tempo.cod_emp,tempo.local,tempo.alternativo,tempo.dt_ref,__saldo_f,_id_fechamento) into __saldo_f ;
+
+                      end if;
+                      
                       update nfe_det_trade set saldo = __saldo_f , status = '1' where id_grupo = tempo.id_grupo and id_planilha = tempo.id_planilha and nro_linha = tempo.nro_linha;
+                      
                   end if;
               
                end if;
@@ -460,34 +363,99 @@
         material    text,
         saldo_ini_conv numeric(15,4),
         saldo_imp_conv numeric(15,4),
-        alternativo    text
+        alternativo  text
     );
+
+-- DROP FUNCTION public.seek_entrada_saldo(in int4, in text, in text, in text, in numeric, in int4, out numeric);
+
+CREATE OR REPLACE FUNCTION public.seek_entrada_saldo(_id_grupo integer, _cod_empresa text, _local text, _material text, _saldo_s numeric, _id_fechamento integer, OUT _saldo_f numeric)
+ RETURNS numeric
+ LANGUAGE plpgsql
+AS $function$
+    DECLARE
+
+    entrada  public.nfe_det_trade%ROWTYPE;
+    _saldo_e numeric(15,4);
+    _qtd     numeric(15,4);
+    _last    date;
+    _hoje    date;
+    _data    date;
+
+    BEGIN
+
+        _saldo_f := _saldo_s;
+        _qtd     := 0;
+        _hoje    := CURRENT_DATE;
+        _data    := Date '2017-02-28';
+        
+        
+        FOR entrada in  
+           SELECT *
+           FROM NFE_DET_TRADE ENT
+           WHERE  ENT.id_grupo = _id_grupo and ENT.cod_emp = _cod_empresa and ENT.local = _local and ENT.material = _material and (ENT.id_operacao = 'X' OR ENT.id_operacao = 'x') and (ENT.saldo > 0) and ( ENT.dt_ref <= _data)
+           ORDER BY ENT.cod_emp,ENT.local,ENT.material,ENT.id_operacao desc,ENT.dt_ref desc
+        LOOP     
+           
+               
+
+               
+
+               _saldo_e := entrada.saldo;
+
+               
+               IF (_saldo_s >= _saldo_e) THEN
+
+                   _qtd     := _saldo_e;
+
+                   _saldo_s := _saldo_s - _saldo_e;
+
+                   _saldo_e :=  0;
+
+               ELSE 
+
+                  _qtd      := _saldo_s;
+
+                  _saldo_e  := _saldo_e - _saldo_s;
+
+                  _saldo_s  := 0; 
+
+               END IF;
+
+               _saldo_f := _saldo_s;
+                         
+              INSERT INTO controle_s(id_grupo,id_fechamento,cod_emp,local,material,id_e, nro_linha_e, qtd_e ,qtd_s) VALUES(_id_grupo,_id_fechamento,_cod_empresa, _local,_material, entrada.id_planilha , entrada.nro_linha, _qtd ,_saldo_f);
+  
+              IF (_saldo_f = 0) THEN
+
+                  return;
+
+              END IF;
+
+        END LOOP;
+
+    END;
+    $function$
+;
+
     
-    CREATE OR REPLACE FUNCTION "public"."calculo_saldo_inicial" (in _id_grupo int4, in _cod_emp text, in _local text , in _id_fechamento int, out _saida int) 
+DROP FUNCTION IF EXISTS calculo_saldo_inicial;
+CREATE OR REPLACE FUNCTION "public"."calculo_saldo_inicial" (in _id_grupo int4, in _cod_emp text, in _local text , in _id_fechamento int, out _saida int) 
     RETURNS int
     AS
     $$
     DECLARE
-
     tempo    public.Reg_Saldo%ROWTYPE;
-
     __saldo_f     numeric(15,4);
-
     _status text ;
-
-
     BEGIN
-
        _saida = 0;
-
       FOR tempo in  
-     
           SELECT    sld.id_grupo         as id_grupo,
                     sld.cod_emp          as cod_emp,
                     sld.local            as local,
                     sld.material         as material,
                     sld.saldo_ini_conv   as saldo_ini_conv ,
-                    sld.saldo_imp_conv   as saldo_imp_conv,
+                    sld.saldo_imp_conv   as saldo_imp_conv ,
                     coalesce(depara.para_material,'') as alternativo
           FROM   saldo_inicial SLD
           INNER JOIN resumo_5405 resumo on resumo.id_grupo = sld.id_grupo and resumo.cod_emp = sld.cod_emp and resumo.local = sld.local and resumo.material = sld.material
@@ -497,6 +465,7 @@
 
           LOOP      
           
+                 RAISE NOTICE 'Cheguei Aqui!!';
                  _status = '0';
              
                  select _saldo_f from seek_entrada_saldo(tempo.id_grupo,tempo.cod_emp,tempo.local,tempo.material,tempo.saldo_ini_conv,_id_fechamento) into __saldo_f ;
@@ -540,7 +509,7 @@
 
     /*
     
-    select * from public.resumo_5405 where local = '0002'
+ select * from public.resumo_5405 where local = '0002'
 
 //Update para atualizar os saldos com fator de conversão
 UPDATE  saldo_inicial sld
@@ -593,10 +562,10 @@ select * from
     sai_material     text,
     sai_denom        text,
     sai_unid         text,
-    sai_quantidade_1 numeric(15,4),
-    sai_valor        numeric(15,4),
-    sai_icst_valor   numeric(15,2),
-    sai_fest_valor   numeric(15,2),
+    sai_qtd_convertida numeric(15,4),
+    sai_valor          numeric(15,4),
+    sai_icst_valor     numeric(15,2),
+    sai_fest_valor     numeric(15,2),
     sai_id_saida     int4,
     sai_nro_linha_saida    int4,
     dev_id_grupo     int4,
@@ -610,7 +579,7 @@ select * from
     dev_material     text,
     dev_denom        text,
     dev_unid         text,
-    dev_quantidade_1 numeric(15,4),
+    dev_qtd_convertida numeric(15,4),
     dev_valor        numeric(15,4),
     dev_icst_valor   numeric(15,2),
     dev_fest_valor   numeric(15,2),
@@ -628,7 +597,7 @@ select * from
       função usada na check_devolução
 
     */
-
+    DROP FUNCTION "public"."seek_dev_saida";
     CREATE OR REPLACE FUNCTION "public"."seek_dev_saida" (
     in  _id_grupo     int4,
     in  _cod_emp      text,
@@ -655,7 +624,7 @@ select * from
         FOR saida in  
            SELECT *
            FROM NFE_DET_TRADE SAI
-           WHERE  SAI.id_grupo = _id_grupo and SAI.cod_emp = _cod_emp and SAI.local = _local and SAI.material = _material and  sai.id_operacao = 'S' and LEFT(SAI.cfop,4) = '5405' and sai.nro_doc = _doc_origem and sai.material = _material
+           WHERE  SAI.id_grupo = _id_grupo and SAI.cod_emp = _cod_emp and SAI.local = _local and SAI.material = _material and  sai.id_operacao = 'S' and LEFT(SAI.cfop,4) = '5405' and sai.nro_doc = _doc_origem and sai.material = _material and sai.dt_ref >= '2017-03-01'
            ORDER BY SAI.cod_emp, SAI.local, SAI.dt_ref, SAI.nro_doc, SAI.nro_item 
         LOOP     
            
@@ -663,7 +632,7 @@ select * from
 
            //RAISE NOTICE '_id_grupo % _id_s  % _nro_linha_s % _cod_empresa % _local % _material  % _data  % _saldo_s % ', _id_grupo,_id_s,_nro_linha_s,_cod_empresa,_local,_material,_data,_saldo_s;
 
-           IF (SAIDA.quantidade_1 = _qtd_d) THEN
+           IF (SAIDA.qtd_convertida = _qtd_d) THEN
 
                _id_saida  := SAIDA.id_planilha;
                _nro_linha := SAIDA.nro_linha;
@@ -740,7 +709,7 @@ select * from
                                 sai_dev.dev_nro_linha   ,
                                 sai_dev.dev_doc_origem  ,
                                 sai_dev.dev_material    ,
-                                sai_dev.dev_quantidade_1       
+                                sai_dev.dev_qtd_convertida       
                               ) into __id_saida, __nro_linha;
                             //RAISE NOTICE  'ID % NRO_LINHA % ',__id_saida, __nro_linha ;
                             if (__id_saida > 0) then
@@ -868,7 +837,7 @@ select * from
              ven_nro_doc		text,
              ven_nro_item		text,
              ven_material		text,
-             ven_quantidade_1	numeric(15,4),
+             ven_qtd_convertida	numeric(15,4),
              ven_preco_liq		numeric(15,4),
              ven_vlr_contb		numeric(15,4),
              ven_saldo		    numeric(15,4),
@@ -924,7 +893,7 @@ select * from
      vlr_economico_pis_corrigido    numeric(15,4);
      vlr_economico_cofins_corrigido numeric(15,4);
      taxa numeric(6,2);
-
+     data_inicial _data    := Date '2017-03-16';
 
     BEGIN
 
@@ -932,7 +901,7 @@ select * from
 
             _saida := 0;
 
-             taxa := 0;
+             taxa  := 0;
  
             //RAISE NOTICE  'Gravação de saldos % % % % % ' ,  _empresa  , _filial  ,  _cdcc , _ano   , _mes   ;
        
@@ -947,7 +916,7 @@ select * from
                            ,ven.nro_doc
                            ,ven.nro_item
                            ,ven.material
-                           ,ven.quantidade_1
+                           ,ven.qtd_convertida
                            ,ven.preco_liq
                            ,ven.vlr_contb
                            ,ven.saldo
@@ -959,7 +928,7 @@ select * from
                            ,ven.cof_taxa
                            ,ven.cof_vlr
                            ,con.qtd_e           as qtd_usada
-                            ,con.qtd_e          as qtd_saida
+                           ,con.qtd_e           as qtd_saida
                            ,ent.quantidade_1    as qtd_entrada
                            ,ent.icst_valor
                            ,ent.fest_valor
@@ -1002,9 +971,9 @@ select * from
 
                                 Icms_St_Unit         :=  (notas.ent_icst_valor + notas.ent_fest_valor) / notas.ent_qtd_entrada  ;
 
-                                Base_Pis_Nova        :=  notas.ven_pis_base      - ( notas.con_qtd_usada * Icms_St_Unit);
+                                Base_Pis_Nova        :=  notas.ven_pis_base - ( notas.con_qtd_usada * Icms_St_Unit);
 
-                                Base_Cofins_Nova     :=  notas.ven_cof_base      - ( notas.con_qtd_usada * Icms_St_Unit);
+                                Base_Cofins_Nova     :=  notas.ven_cof_base - ( notas.con_qtd_usada * Icms_St_Unit);
 
                                 Perc_Pis_Novo        :=  notas.ven_pis_taxa;
 
@@ -1070,6 +1039,190 @@ select * from
                                           ,vlr_economico_cofins_corrigido
                                           ,taxa
                                           ,Icms_St_Unit
+                                          ,notas.con_qtd_usada
+                                          ,1
+                                          ,1);
+                             _saida = _saida + 1;
+
+                        END IF;
+                    
+                END LOOP;
+            
+                RETURN; 
+    END;
+    $$
+    LANGUAGE 'plpgsql'
+    go
+
+
+    CREATE OR REPLACE FUNCTION "public"."vlr_enconomico_v3" (
+                               in _grupo int4, in _cod_emp text , in _local text , in _mes_ano text, in _ano_selic int4, in _mes_selic int4, out _saida int4)  
+    AS
+    $$
+    DECLARE
+     notas public.NOTAS%ROWTYPE;
+     Comentarios boolean;  
+     Icms_St_Unit numeric(15,4);
+     Qtd_Usada numeric(15,4);
+     Base_Pis_Nova numeric(15,4);
+     Base_Cofins_Nova numeric(15,4);
+     Perc_Pis_Novo numeric(6,2);
+     Vlr_Pis_Novo numeric(15,4); 
+     Perc_Cofins_Novo numeric(6,2);
+     Vlr_Cofins_Novo                numeric(15,4);
+     vlr_economico_pis              numeric(15,4);
+     vlr_economico_cofins           numeric(15,4);
+     vlr_economico_pis_corrigido    numeric(15,4);
+     vlr_economico_cofins_corrigido numeric(15,4);
+     taxa numeric(6,2);
+     data_inicial Date;
+
+    BEGIN
+
+            data_inicial := Date '2017-03-16';
+
+            Comentarios  := true;
+
+            _saida := 0;
+
+             taxa  := 0;
+ 
+            //RAISE NOTICE  'Gravação de saldos % % % % % ' ,  _empresa  , _filial  ,  _cdcc , _ano   , _mes   ;
+       
+            FOR notas in SELECT 
+                            ven.id_grupo
+                           ,ven.id_planilha
+                           ,ven.id_operacao
+                           ,ven.nro_linha
+                           ,ven.cod_emp
+                           ,ven.local
+                           ,ven.dt_ref
+                           ,ven.nro_doc
+                           ,ven.nro_item
+                           ,ven.material
+                           ,ven.qtd_convertida
+                           ,ven.preco_liq
+                           ,ven.vlr_contb
+                           ,ven.saldo
+                           ,ven.qtd_dev
+                           ,ven.pis_base
+                           ,ven.pis_taxa
+                           ,ven.pis_vlr
+                           ,ven.cof_base
+                           ,ven.cof_taxa
+                           ,ven.cof_vlr
+                           ,con.qtd_e           as qtd_usada
+                           ,con.qtd_e           as qtd_saida
+                           ,ent.qtd_convertida  as qtd_entrada
+                           ,ent.icst_valor
+                           ,ent.fest_valor
+                           ,ent.saldo
+                           ,ent.id_grupo
+                           ,ent.id_planilha
+                           ,ent.id_operacao
+                           ,ent.nro_linha
+                           ,ent.cod_emp
+                           ,ent.local
+                           ,ent.nro_doc
+                           ,ent.dt_ref
+                           ,ent.nro_item
+                           ,ent.material
+                           ,ent.pis_base
+                           ,ent.pis_taxa
+                           ,ent.pis_vlr
+                           ,ent.cof_base
+                           ,ent.cof_taxa
+                           ,ent.cof_vlr
+                   from     controle_e con 
+                   inner join nfe_det_trade ven on ven.id_grupo = con.id_grupo and ven.id_planilha = con.id_s and ven.nro_linha = con.nro_linha_s
+                   inner join nfe_det_trade ent on ent.id_grupo = con.id_grupo and ent.id_planilha  = con.id_e and ent.nro_linha = con.nro_linha_e 
+                   where con.id_grupo = _grupo and con.id_fechamento = 1  and VEN.cod_emp = _cod_emp and VEN.LOCAL = _local  and ven.dt_ref >= data_inicial and to_char(VEN.dt_ref,'DD/MM/YYYY') = _mes_ano  and  VEN.STATUS = '1' and  VEN.ID_OPERACAO = 'S'  and  con.id_fechamento = 1
+                   order by ven.cod_emp
+                           ,ven.local
+                           ,ven.id_planilha
+                           ,ven.dt_ref
+                           ,ven.nro_doc
+                           ,ven.nro_item
+                           ,ven.material
+                LOOP            
+                   
+                        IF ( notas.con_qtd_usada  <= 0) THEN
+
+                                // RAISE NOTICE  'Nota Sem Saldo Saida %  Entrada %' ,  notas.ven_nro_doc,notas.ent_nro_doc   ;
+                        ELSE 
+
+                                // RAISE NOTICE  'Nota % ' ,  notas.ven_nro_doc   ;
+
+                                Icms_St_Unit         :=  (notas.ent_icst_valor + notas.ent_fest_valor) / notas.ent_qtd_entrada  ;
+
+                                Base_Pis_Nova        :=  notas.ven_pis_base  - ( notas.con_qtd_usada * Icms_St_Unit);
+
+                                Base_Cofins_Nova     :=  notas.ven_cof_base  - ( notas.con_qtd_usada * Icms_St_Unit);
+
+                                Perc_Pis_Novo        :=  notas.ven_pis_taxa;
+
+                                Vlr_Pis_Novo         :=  Base_Pis_Nova  * (Perc_Pis_Novo / 100);
+
+                                Perc_Cofins_Novo     :=  notas.ven_cof_taxa;
+
+                                Vlr_Cofins_Novo      :=  Base_Cofins_Nova  * (Perc_Cofins_Novo / 100);
+
+                                if (taxa = 0 ) then
+
+                                   taxa = (SELECT get_selic as tax FROM get_selic( cast( to_char(notas.ven_dt_ref, 'YYYY') AS INT4), cast (to_char(notas.ven_dt_ref, 'MM') AS INT4),_ano_selic,_mes_selic) );
+
+                                end if;
+
+                                IF (notas.ven_pis_vlr > Vlr_Pis_Novo) THEN
+                                   vlr_economico_pis              :=      notas.ven_pis_vlr - Vlr_Pis_Novo;
+                                   vlr_economico_pis_corrigido    :=      vlr_economico_pis  * ( (taxa / 100) + 1);
+                                ELSE 
+                                   vlr_economico_pis              :=      0;
+                                   vlr_economico_pis_corrigido    :=      0;
+                                END IF; 
+                            
+                                //RAISE NOTICE  'notas.ven_cof_vlr % Vlr_Cofins_Novo % Base_Cofins_Nova % Base_Pis_Nova % notas.ent_cof_base %' ,  notas.ven_cof_vlr , Vlr_Cofins_Novo , Base_Cofins_Nova, Base_Pis_Nova , notas.ent_cof_base;
+
+                                IF (notas.ven_cof_vlr > Vlr_Cofins_Novo) THEN
+                                   vlr_economico_cofins              :=  notas.ven_cof_vlr - Vlr_Cofins_Novo;
+                                   vlr_economico_cofins_corrigido    :=  vlr_economico_cofins  * ( (taxa / 100) + 1);
+                                ELSE 
+                                   vlr_economico_cofins              :=  0;
+                                   vlr_economico_cofins_corrigido    :=  0;
+                                END IF; 
+
+                                INSERT INTO nfe_det_trade_val(
+                                            id_grupo
+                                          , id
+                                          , nro_linha
+                                          , id_planilha_entrada   
+                                          , nro_linha_entrada  
+                                          , dtnfe
+                                          , dtcredito
+                                          , vlr_economico_pis
+                                          , vlr_economico_cofins
+                                          , dtfcorrecao
+                                          , vlr_economico_pis_corrigido
+                                          , vlr_economico_cofins_corrigido
+                                          , taxa
+                                          , Icms_St_Unit
+                                          , qtd_calculada
+                                          , usuarioinclusao
+                                          , usuarioatualizacao) 
+                                VALUES(   notas.ven_id_grupo
+                                          ,notas.ven_id_planilha
+                                          ,notas.ven_nro_linha
+                                          ,notas.ent_id_planilha
+                                          ,notas.ent_nro_linha
+                                          ,notas.ven_dt_ref
+                                          ,'2025-01-31'
+                                          ,vlr_economico_pis
+                                          ,vlr_economico_cofins
+                                          ,'2025-01-31'
+                                          ,vlr_economico_pis_corrigido
+                                          ,vlr_economico_cofins_corrigido
+                                          ,taxa
+                                          ,Icms_St_Unit
                                           ,0
                                           ,1
                                           ,1);
@@ -1085,6 +1238,7 @@ select * from
     LANGUAGE 'plpgsql'
     go
 
+
     CREATE OR REPLACE FUNCTION "public"."vlr_enconomico_c" (
                                in _grupo int4, in _cod_emp text , in _local text , in _mes_ano text, in _ano_selic int4, in _mes_selic int4, out _saida int4)  
     AS
@@ -1092,22 +1246,22 @@ select * from
     DECLARE
      notas public.NOTAS%ROWTYPE;
      Comentarios boolean;  
-     Icms_St_Unit numeric(15,4);
-     Base_Pis_Nova numeric(15,4);
+     Icms_St_Unit     numeric(15,4);
+     Base_Pis_Nova    numeric(15,4);
      Base_Cofins_Nova numeric(15,4);
-     Perc_Pis_Novo numeric(6,2);
-     Vlr_Pis_Novo numeric(15,4); 
+     Perc_Pis_Novo    numeric(6,2);
+     Vlr_Pis_Novo     numeric(15,4); 
      Perc_Cofins_Novo numeric(6,2);
-     Vlr_Cofins_Novo                numeric(15,4);
+     Vlr_Cofins_Novo                 numeric(15,4);
      _vlr_economico_pis              numeric(15,4);
      _vlr_economico_cofins           numeric(15,4);
      _vlr_economico_pis_corrigido    numeric(15,4);
      _vlr_economico_cofins_corrigido numeric(15,4);
-     taxa numeric(6,2);
+     taxa                            numeric(6,2);
      old_id int4;
      old_nro_linha int4;
-     old_qtd  numeric(15,4);
-     qtd_calculo  numeric(15,4);
+     old_qtd                          numeric(15,4);
+     qtd_calculo                      numeric(15,4);
      id_devolucao int4;
      nro_linha_devolucao int4;
     _id_grupo int4;
@@ -1577,18 +1731,18 @@ select * from
            // NFE ENTRADA
            select id_operacao from nfe_det_trade into _operacao
            where id_grupo = NEW.id_grupo and id_planilha = NEW.id_e and nro_linha = NEW.nro_linha_e;
-           if (_operacao = 'X' OR _operacao = 'x') THEN
-              if (_operacao = 'X') THEN
-                  _operacao := 'E';
-              else 
-                  _operacao := 'e';
-              end if;
+           //if (_operacao = 'X' OR _operacao = 'x') THEN
+           //   if (_operacao = 'X') THEN
+           //       _operacao := 'E';
+           //   else 
+           //       _operacao := 'e';
+           //   end if;
               update nfe_det_trade set saldo = saldo - NEW.qtd_e, saldo_inicial = saldo_inicial + NEW.qtd_e , id_operacao = _operacao 
               where id_grupo = NEW.id_grupo and id_planilha = NEW.id_e and nro_linha = NEW.nro_linha_e;
-           ELSE
-            update nfe_det_trade set saldo = saldo - NEW.qtd_e, saldo_inicial = saldo_inicial + NEW.qtd_e 
-            where id_grupo = NEW.id_grupo and id_planilha = NEW.id_e and nro_linha = NEW.nro_linha_e;
-           end if;
+           //ELSE
+           // update nfe_det_trade set saldo = saldo - NEW.qtd_e, saldo_inicial = saldo_inicial + NEW.qtd_e 
+           // where id_grupo = NEW.id_grupo and id_planilha = NEW.id_e and nro_linha = NEW.nro_linha_e;
+           //end if;
            RETURN NEW;
        END IF;
     END ;
@@ -1604,4 +1758,52 @@ select * from
       ON controle_s
       FOR EACH ROW
       EXECUTE PROCEDURE function_controle_sld()
+    go
+
+
+
+    drop function  "public"."importa_sld_excel";
+go
+CREATE OR REPLACE FUNCTION "public"."importa_sld_excel"(
+    in  _id_grupo     int4,
+    in  _cod_empresa  text,
+    in  _local        text,
+    in  _material     text,
+    in  _saldo        numeric(15,4),
+    in  _descricao    text,
+    out _saida        int4
+    ) 
+    RETURNS int4
+    AS
+    $$
+    DECLARE
+
+    _saldo_inicial numeric(15,4);
+    
+    BEGIN
+
+       select saldo_inicial from saldo_inicial into _saldo_inicial where id_grupo = _id_grupo and cod_emp = _cod_empresa and local = _local and material = _material;
+    
+       if (_saldo_inicial is null) then
+           RAISE NOTICE  'Saldo Inicial Não Encontrado ';
+           INSERT INTO saldo_inicial(id_grupo,cod_emp,local,material,descricao,saldo_inicial,saldo_ini_conv,saldo_imp_conv,fator,ct,status) 
+           values (
+            _id_grupo     ,
+            _cod_empresa  ,
+            _local        ,
+            _material     ,
+            _descricao    ,
+            _saldo        ,
+            0,0,0,1,'0');
+       else 
+           RAISE NOTICE  'Saldo Inicial % ',_saldo_inicial;
+           update  public.saldo_inicial set saldo_inicial = saldo_inicial + _saldo,  ct = ct + 1
+           where id_grupo = _id_grupo and cod_emp = _cod_empresa and local = _local and material = _material ;
+       end if;
+       
+       _saida = 1;
+       
+    END;
+    $$
+    LANGUAGE 'plpgsql'
     go

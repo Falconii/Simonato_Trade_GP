@@ -18,7 +18,7 @@ using System.Windows.Forms;
  * 
  * Servidor 192.168.0.161 
  * Usuario postgres
- * Senha   S1m10n4t0SQL  - S1m10n4t0ACD
+ * Senha   S1m10n4t0SQL  - S1m10n4t0
  * Porta   49777
  * 
  * Usuario: Marcos
