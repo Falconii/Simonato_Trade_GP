@@ -76,9 +76,9 @@ namespace Trade_GP
             this.gbParametros.Controls.Add(this.btParametros);
             this.gbParametros.Controls.Add(this.btProximo);
             this.gbParametros.Location = new System.Drawing.Point(0, 68);
-            this.gbParametros.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.gbParametros.Margin = new System.Windows.Forms.Padding(4);
             this.gbParametros.Name = "gbParametros";
-            this.gbParametros.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.gbParametros.Padding = new System.Windows.Forms.Padding(4);
             this.gbParametros.Size = new System.Drawing.Size(287, 199);
             this.gbParametros.TabIndex = 63;
             this.gbParametros.TabStop = false;
@@ -88,7 +88,7 @@ namespace Trade_GP
             // 
             this.btParametros.BackColor = System.Drawing.Color.Red;
             this.btParametros.Location = new System.Drawing.Point(20, 43);
-            this.btParametros.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.btParametros.Margin = new System.Windows.Forms.Padding(4);
             this.btParametros.Name = "btParametros";
             this.btParametros.Size = new System.Drawing.Size(193, 28);
             this.btParametros.TabIndex = 7;
@@ -100,7 +100,7 @@ namespace Trade_GP
             // 
             this.btProximo.ForeColor = System.Drawing.Color.Green;
             this.btProximo.Location = new System.Drawing.Point(144, 103);
-            this.btProximo.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.btProximo.Margin = new System.Windows.Forms.Padding(4);
             this.btProximo.Name = "btProximo";
             this.btProximo.Size = new System.Drawing.Size(133, 28);
             this.btProximo.TabIndex = 6;
@@ -112,7 +112,7 @@ namespace Trade_GP
             // 
             this.dbLocais.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dbLocais.Location = new System.Drawing.Point(295, 68);
-            this.dbLocais.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.dbLocais.Margin = new System.Windows.Forms.Padding(4);
             this.dbLocais.Name = "dbLocais";
             this.dbLocais.RowHeadersWidth = 51;
             this.dbLocais.Size = new System.Drawing.Size(941, 199);
@@ -138,7 +138,7 @@ namespace Trade_GP
             this.dbMeses.CausesValidation = false;
             this.dbMeses.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dbMeses.Location = new System.Drawing.Point(16, 354);
-            this.dbMeses.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.dbMeses.Margin = new System.Windows.Forms.Padding(4);
             this.dbMeses.Name = "dbMeses";
             this.dbMeses.RowHeadersWidth = 51;
             this.dbMeses.Size = new System.Drawing.Size(656, 453);
@@ -173,7 +173,7 @@ namespace Trade_GP
             this.dtGridLog.CausesValidation = false;
             this.dtGridLog.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dtGridLog.Location = new System.Drawing.Point(689, 354);
-            this.dtGridLog.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.dtGridLog.Margin = new System.Windows.Forms.Padding(4);
             this.dtGridLog.Name = "dtGridLog";
             this.dtGridLog.RowHeadersWidth = 51;
             this.dtGridLog.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
@@ -194,9 +194,9 @@ namespace Trade_GP
             this.gbMensaProcessamento.Controls.Add(this.pgProcesso);
             this.gbMensaProcessamento.Controls.Add(this.btProcessar);
             this.gbMensaProcessamento.Location = new System.Drawing.Point(1244, 68);
-            this.gbMensaProcessamento.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.gbMensaProcessamento.Margin = new System.Windows.Forms.Padding(4);
             this.gbMensaProcessamento.Name = "gbMensaProcessamento";
-            this.gbMensaProcessamento.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.gbMensaProcessamento.Padding = new System.Windows.Forms.Padding(4);
             this.gbMensaProcessamento.Size = new System.Drawing.Size(567, 199);
             this.gbMensaProcessamento.TabIndex = 71;
             this.gbMensaProcessamento.TabStop = false;
@@ -216,13 +216,12 @@ namespace Trade_GP
             // 
             this.cbSelic.FormattingEnabled = true;
             this.cbSelic.Items.AddRange(new object[] {
-            "06/2024",
-            "07/2024",
-            "08/2024",
-            "09/2024",
-            "10/2024"});
+            "11/2024",
+            "12/2024",
+            "01/2025",
+            "02/2025"});
             this.cbSelic.Location = new System.Drawing.Point(253, 119);
-            this.cbSelic.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.cbSelic.Margin = new System.Windows.Forms.Padding(4);
             this.cbSelic.Name = "cbSelic";
             this.cbSelic.Size = new System.Drawing.Size(217, 24);
             this.cbSelic.TabIndex = 6;
@@ -245,7 +244,7 @@ namespace Trade_GP
             "2-CORREÇÃO",
             "3-ATUALIZAÇÃO"});
             this.cbTipoProcessamento.Location = new System.Drawing.Point(12, 117);
-            this.cbTipoProcessamento.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.cbTipoProcessamento.Margin = new System.Windows.Forms.Padding(4);
             this.cbTipoProcessamento.Name = "cbTipoProcessamento";
             this.cbTipoProcessamento.Size = new System.Drawing.Size(217, 24);
             this.cbTipoProcessamento.TabIndex = 4;
@@ -273,7 +272,7 @@ namespace Trade_GP
             // pgProcesso
             // 
             this.pgProcesso.Location = new System.Drawing.Point(8, 53);
-            this.pgProcesso.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.pgProcesso.Margin = new System.Windows.Forms.Padding(4);
             this.pgProcesso.Name = "pgProcesso";
             this.pgProcesso.Size = new System.Drawing.Size(547, 28);
             this.pgProcesso.TabIndex = 1;
@@ -281,7 +280,7 @@ namespace Trade_GP
             // btProcessar
             // 
             this.btProcessar.Location = new System.Drawing.Point(253, 159);
-            this.btProcessar.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.btProcessar.Margin = new System.Windows.Forms.Padding(4);
             this.btProcessar.Name = "btProcessar";
             this.btProcessar.Size = new System.Drawing.Size(301, 28);
             this.btProcessar.TabIndex = 0;
@@ -304,7 +303,7 @@ namespace Trade_GP
             this.Controls.Add(this.dbLocais);
             this.Controls.Add(this.gbParametros);
             this.Controls.Add(this.lblTitulo);
-            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "FormVlrEconomicoLotes";
             this.Text = "Calculo Valor Econômico Por Lote";
             this.Activated += new System.EventHandler(this.FormVlrEconomicoLotes_Activated);

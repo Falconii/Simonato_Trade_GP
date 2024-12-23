@@ -124,20 +124,74 @@ namespace Trade_GP.Util
                         }
                         else
                         {
-                            fields[1] = Regex.Replace(fields[1], "[A-Za-z]", "0");
-
-
-                            if (!loadMaterais)
+                            try
                             {
+                                fields[1] = Regex.Replace(fields[1], "[A-Za-z]", "0");
 
-                                daoResumo5405 daoMaterais = new daoResumo5405();
+                                DateTime dt_ref;
 
-                                materiais = daoMaterais.getAll(1, fields[0], fields[1]);
+                                if (fields[12].Trim() == "")
+                                {
 
-                                loadMaterais = true;
+                                    ContadorLinhas++;
 
+                                    continue;
+
+                                }
+                                if ("123".Contains(fields[12].Substring(0, 1)))
+                                {
+                                    if (!DateTime.TryParseExact(fields[11], "dd/MM/yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out dt_ref))
+                                    {
+                                        throw new Exception("Data inválida em fields[11]!");
+                                    }
+                                }
+                                else if ("567".Contains(fields[12].Substring(0, 1)))
+                                {
+                                    if (!DateTime.TryParseExact(fields[10], "dd/MM/yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out dt_ref))
+                                    {
+                                        throw new Exception("Data inválida em fields[10]!");
+                                    }
+                                }
+                                else
+                                {
+                                    throw new Exception("CFOP inválido!");
+                                }
+
+                                if (!loadMaterais)
+                                {
+                                    try
+                                    {
+                                        daoResumo5405 daoMaterais = new daoResumo5405();
+                                        materiais = daoMaterais.getAll(1, fields[0], fields[1]);
+                                        loadMaterais = true;
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        ImportacaoAsync.StaticLsErrosImportacao.Add(new ErrosImportacao(
+                                            "E",
+                                            fileName,
+                                            $"{ContadorLinhas}",
+                                            "Materiais",
+                                            fields[0],
+                                            0,
+                                            $"Erro ao carregar materiais: {ex.Message}"
+                                        ));
+                                    }
+                                }
                             }
-
+                            catch (Exception ex)
+                            {
+                                ImportacaoAsync.StaticLsErrosImportacao.Add(new ErrosImportacao(
+                                    "E",
+                                    fileName,
+                                    $"{ContadorLinhas}",
+                                    "Dt_Lanc",
+                                    fields[11],
+                                    0,
+                                    $"Erro na execução: {ex.Message}"
+                                ));
+                            }
+                        
                             if (filtroCfop == "TODAS" && materiais.Count() == 0)
                             {
                                 ImportacaoAsync.StaticLsErrosImportacao.Add(new ErrosImportacao("E", fileName, "", "", "", 0, "Para Esta Operação Preciso Do Resumo De Materais!"));
@@ -202,7 +256,7 @@ namespace Trade_GP.Util
                                     Console.WriteLine("Em Branco");
                                 }
 
-                                var achou = materiais.FirstOrDefault(mat => mat.material.Trim() == fields[15].Trim());
+                                var achou = materiais.FirstOrDefault(mat => mat.material.Trim() == fields[15].Trim() && mat.unid.Trim() == fields[19].Trim());
 
                                 if (achou == null)
                                 {
@@ -230,7 +284,8 @@ namespace Trade_GP.Util
                                     local = lsMoviDet[lsMoviDet.Count - 1].Local,
                                     material = lsMoviDet[lsMoviDet.Count - 1].Material,
                                     descricao = lsMoviDet[lsMoviDet.Count - 1].Denom,
-                                    unid = lsMoviDet[lsMoviDet.Count - 1].Unid
+                                    unid = lsMoviDet[lsMoviDet.Count - 1].Unid,
+                                    dt_ref = lsMoviDet[lsMoviDet.Count - 1].Dt_Ref
                                 };
 
                                 daoresumo.UpdateX(resumo);
@@ -272,7 +327,8 @@ namespace Trade_GP.Util
                                     cod_emp = lsMoviDet[lsMoviDet.Count - 1].Cod_Emp,
                                     local = lsMoviDet[lsMoviDet.Count - 1].Local,
                                     material = lsMoviDet[lsMoviDet.Count - 1].Material,
-                                    unid = lsMoviDet[lsMoviDet.Count - 1].Unid
+                                    unid = lsMoviDet[lsMoviDet.Count - 1].Unid,
+                                    dt_ref = lsMoviDet[lsMoviDet.Count - 1].Dt_Ref
                                 };
 
                                 daoresumo.UpdateX(resumo);
@@ -955,7 +1011,7 @@ namespace Trade_GP.Util
                     }
                     else
                     {
-                        retorno = "z";
+                        retorno = "Y";
                     }
                 }
                 else

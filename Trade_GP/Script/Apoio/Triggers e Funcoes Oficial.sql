@@ -55,7 +55,7 @@
            WHERE  ENT.id_grupo = _id_grupo and ENT.cod_emp = _cod_empresa and ENT.local = _local and ENT.material = _material and 
                   ((ENT.dt_ref >= '2017-03-01' AND ENT.id_operacao = 'E' AND ENT.cof_vlr > 0 AND ENT.saldo > 0) OR (ENT.dt_ref <= '2017-02-28' AND ENT.id_operacao = 'X' AND ENT.cof_vlr > 0 AND ENT.saldo_inicial > 0)) 
                   and ( ENT.dt_ref >= _LAST AND ENT.dt_ref <= _data)
-           ORDER BY ENT.cod_emp,ENT.local,ENT.material,ENT.id_operacao desc,ENT.dt_ref desc
+           ORDER BY ENT.cod_emp,ENT.local,ENT.material,ENT.dt_ref desc , ENT.id_operacao desc
         LOOP     
            
                //RAISE NOTICE 'ENTRADA.cod_empresa % ENTRADA.local % ENTRADA.material % ENTRADA.dtlanc % ENTRADA.qtd % ENTRADA.saldo % ENTRADA.status %', entrada.cod_emp,entrada.local,entrada.material,entrada.dtlanc,entrada.qtd, entrada.saldo, entrada.status;
@@ -159,7 +159,7 @@
            WHERE  ENT.id_grupo = _id_grupo and ENT.cod_emp = _cod_empresa and ENT.local = _local and ENT.material = _material and 
                   ((ENT.dt_ref >= '2017-03-01' AND ENT.id_operacao = 'e' AND ENT.saldo > 0) OR (ENT.dt_ref <= '2017-02-28' AND ENT.id_operacao = 'x'  AND ENT.saldo_inicial > 0)) 
                   and ( ENT.dt_ref >= _LAST AND ENT.dt_ref <= _data)
-           ORDER BY ENT.cod_emp,ENT.local,ENT.material,ENT.id_operacao desc,ENT.dt_ref desc
+           ORDER BY ENT.cod_emp,ENT.local,ENT.material,ENT.dt_ref desc, ENT.id_operacao desc
         LOOP     
            
                //RAISE NOTICE 'ENTRADA.cod_empresa % ENTRADA.local % ENTRADA.material % ENTRADA.dtlanc % ENTRADA.qtd % ENTRADA.saldo % ENTRADA.status %', entrada.cod_empresa,entrada.local,entrada.material,entrada.dtlanc,entrada.qtd, entrada.saldo, entrada.status;
@@ -275,9 +275,9 @@
           FROM   nfe_det_trade DET
           LEFT  JOIN de_para     depara on depara.id_grupo = det.id_grupo and depara.cod_emp = det.cod_emp and depara.local = det.local and depara.de_material = det.material
           WHERE  DET.id_grupo = _id_grupo and DET.cod_emp = _cod_emp and Det.local = _local and 
-                 ( ( ((det.id_operacao = 'S') OR (det.id_operacao = 's')) and det.status = '0'  ) OR (det.id_operacao = 'Z' and det.status = '0'))
+                 ( ( ((det.id_operacao = 'S') OR (det.id_operacao = 's')) and det.status = '0'  ) OR ((det.id_operacao = 'Z') OR (det.id_operacao = 'Y'))  and det.status = '0'))
                  and (TO_CHAR(det.dt_ref,'DD/MM/YYYY') = _mes_ano)  
-          ORDER BY DET.id_grupo,DET.cod_emp,DET.local,DET.id_operacao desc,DET.dt_ref,DET.nro_doc,DET.nro_item 
+          ORDER BY DET.id_grupo,DET.cod_emp,DET.local,DET.dt_ref , DET.id_operacao desc ,DET.nro_doc,DET.nro_item 
 
           LOOP      
              
@@ -393,7 +393,7 @@ AS $function$
            SELECT *
            FROM NFE_DET_TRADE ENT
            WHERE  ENT.id_grupo = _id_grupo and ENT.cod_emp = _cod_empresa and ENT.local = _local and ENT.material = _material and (ENT.id_operacao = 'X' OR ENT.id_operacao = 'x') and (ENT.saldo > 0) and ( ENT.dt_ref <= _data)
-           ORDER BY ENT.cod_emp,ENT.local,ENT.material,ENT.id_operacao desc,ENT.dt_ref desc
+           ORDER BY ENT.cod_emp,ENT.local,ENT.material,ENT.dt_ref desc, ENT.id_operacao desc
         LOOP     
            
                
@@ -685,8 +685,8 @@ select * from
  
             //RAISE NOTICE  'Gravação de saldos % % % % % ' ,  _empresa  , _filial  ,  _cdcc , _ano   , _mes   ;
        
-            FOR sai_dev in SELECT sai.id_grupo,sai.id_planilha,sai.nro_linha,sai.id_operacao,sai.dt_ref,sai.cfop,sai.nro_doc,sai.nro_item,sai.material,sai.denom,sai.unid,sai.quantidade_1,sai.valor,sai.icst_valor,sai.fest_valor,sai.id_saida,sai.nro_linha_saida,
-                                  dev.id_grupo,dev.id_planilha,dev.nro_linha,dev.id_operacao,dev.dt_ref,dev.cfop,dev.nro_doc,dev.item_ref,dev.material,dev.denom,dev.unid,dev.quantidade_1,dev.valor,dev.icst_valor,dev.fest_valor,dev.doc_origem,dev.id_saida,dev.nro_linha_saida
+            FOR sai_dev in SELECT sai.id_grupo,sai.id_planilha,sai.nro_linha,sai.id_operacao,sai.dt_ref,sai.cfop,sai.nro_doc,sai.nro_item,sai.material,sai.denom,sai.unid,sai.qtd_convertida,sai.valor,sai.icst_valor,sai.fest_valor,sai.id_saida,sai.nro_linha_saida,
+                                  dev.id_grupo,dev.id_planilha,dev.nro_linha,dev.id_operacao,dev.dt_ref,dev.cfop,dev.nro_doc,dev.item_ref,dev.material,dev.denom,dev.unid,dev.qtd_convertida,dev.valor,dev.icst_valor,dev.fest_valor,dev.doc_origem,dev.id_saida,dev.nro_linha_saida
                                   FROM       nfe_det_trade dev 
                                   left join nfe_det_trade sai  ON  sai.id_grupo = _grupo and sai.cod_emp = _cod_emp  and sai.local = _local and ( (left(sai.cfop,4) = '5405')) and sai.id_operacao = 'S' and sai.nro_doc = dev.doc_origem and sai.material = dev.material
                                   where      dev.id_grupo = _grupo and dev.cod_emp = _cod_emp  and dev.local = _local and  to_char(dev.dt_ref,'DD/MM/YYYY') = _mes_ano  and dev.id_operacao = 'Z' 
@@ -702,6 +702,135 @@ select * from
                             WHERE id_grupo = sai_dev.dev_id_grupo and id_planilha = sai_dev.dev_id_planilha and nro_linha = sai_dev.dev_nro_linha ;
                          else 
                             select _id_saida, _nro_linha from seek_dev_saida(
+                                _grupo                  ,
+                                _cod_emp                ,
+                                _local                  ,
+                                sai_dev.dev_id_planilha ,
+                                sai_dev.dev_nro_linha   ,
+                                sai_dev.dev_doc_origem  ,
+                                sai_dev.dev_material    ,
+                                sai_dev.dev_qtd_convertida       
+                              ) into __id_saida, __nro_linha;
+                            //RAISE NOTICE  'ID % NRO_LINHA % ',__id_saida, __nro_linha ;
+                            if (__id_saida > 0) then
+                              UPDATE public.nfe_det_trade SET id_saida = __id_saida, nro_linha_saida = __nro_linha
+                              WHERE id_grupo = sai_dev.dev_id_grupo and id_planilha = sai_dev.dev_id_planilha and nro_linha = sai_dev.dev_nro_linha ;
+                              _qtd_dev := _qtd_dev + 1;
+                            else
+                              UPDATE public.nfe_det_trade SET id_operacao = 'z'
+                              WHERE id_grupo = sai_dev.dev_id_grupo and id_planilha = sai_dev.dev_id_planilha and nro_linha = sai_dev.dev_nro_linha ;
+                            end if;
+                   end if;
+                END LOOP;
+            
+                RETURN; 
+    END;
+    $$
+    LANGUAGE 'plpgsql'
+    go
+
+    /*
+
+      seek_dev_saida
+
+      função usada na check_devolução 2
+
+    */
+
+    CREATE OR REPLACE FUNCTION "public"."seek_dev_saida2" (
+    in  _id_grupo     int4,
+    in  _cod_emp      text,
+    in  _local        text,
+    in  _id_d         int4,
+    in  _nro_linha_d  int4,
+    in  _doc_origem   text,
+    in  _material     text,
+    in  _qtd_d        numeric(15,4),
+    out _id_saida int4, 
+    out _nro_linha int4
+    ) 
+    RETURNS record
+    AS
+    $$
+    DECLARE
+
+    saida  public.nfe_det_trade%ROWTYPE;
+
+    BEGIN
+        //Processando as saidas
+       _id_saida  := 0;
+       _nro_linha := 0;
+        FOR saida in  
+           SELECT *
+           FROM NFE_DET_TRADE SAI
+           WHERE  SAI.id_grupo = _id_grupo and SAI.cod_emp = _cod_emp and SAI.local = _local and SAI.material = _material and  sai.id_operacao = 's' and sai.nro_doc = _doc_origem and sai.material = _material and sai.dt_ref >= '2017-03-01'
+           ORDER BY SAI.cod_emp, SAI.local, SAI.dt_ref, SAI.nro_doc, SAI.nro_item 
+        LOOP     
+           
+           //RAISE NOTICE 'SAIDA.cod_empresa % SAIDA.local % SAIDA.material % SAIDA.dtlanc % SAIDA.quantidade_1 % SAIDA.saldo % SAIDA.status %', SAIDA.cod_emp,SAIDA.local,SAIDA.material,SAIDA.dt_lanc,SAIDA.quantidade_1, SAIDA.saldo, SAIDA.status;
+
+           //RAISE NOTICE '_id_grupo % _id_s  % _nro_linha_s % _cod_empresa % _local % _material  % _data  % _saldo_s % ', _id_grupo,_id_s,_nro_linha_s,_cod_empresa,_local,_material,_data,_saldo_s;
+
+           IF (SAIDA.qtd_convertida = _qtd_d) THEN
+
+               _id_saida  := SAIDA.id_planilha;
+               _nro_linha := SAIDA.nro_linha;
+
+               //RAISE NOTICE 'ACHOU ID % NRO_LINHA % ',SAIDA.id_planilha, SAIDA.nro_linha; 
+
+           END IF;
+
+        END LOOP;
+
+    END;
+    $$
+    LANGUAGE 'plpgsql'
+    go
+
+
+    CREATE OR REPLACE FUNCTION "public"."check_devolucao2" (
+                               in _grupo int4, in _cod_emp text , in _local text , in _mes_ano text  , out _qtd_dev int4)  
+    AS
+    $$
+    DECLARE
+
+     sai_dev public.Sai_Dev%ROWTYPE;
+
+     Comentarios boolean;  
+
+     __id_saida int4;
+
+     __nro_linha int4;
+
+    BEGIN
+
+            Comentarios = true;
+
+            _qtd_dev     = 0;
+
+            __id_saida  = 0 ;
+
+            __nro_linha = 0 ;
+ 
+            //RAISE NOTICE  'Gravação de saldos % % % % % ' ,  _empresa  , _filial  ,  _cdcc , _ano   , _mes   ;
+       
+            FOR sai_dev in SELECT sai.id_grupo,sai.id_planilha,sai.nro_linha,sai.id_operacao,sai.dt_ref,sai.cfop,sai.nro_doc,sai.nro_item,sai.material,sai.denom,sai.unid,sai.qtd_convertida,sai.valor,sai.icst_valor,sai.fest_valor,sai.id_saida,sai.nro_linha_saida,
+                                  dev.id_grupo,dev.id_planilha,dev.nro_linha,dev.id_operacao,dev.dt_ref,dev.cfop,dev.nro_doc,dev.item_ref,dev.material,dev.denom,dev.unid,dev.qtd_convertida,dev.valor,dev.icst_valor,dev.fest_valor,dev.doc_origem,dev.id_saida,dev.nro_linha_saida
+                                  FROM       nfe_det_trade dev 
+                                  left join nfe_det_trade sai  ON  sai.id_grupo = _grupo and sai.cod_emp = _cod_emp  and sai.local = _local and  sai.id_operacao = 's' and sai.nro_doc = dev.doc_origem and sai.material = dev.material
+                                  where      dev.id_grupo = _grupo and dev.cod_emp = _cod_emp  and dev.local = _local and  to_char(dev.dt_ref,'DD/MM/YYYY') = _mes_ano  and (dev.id_operacao = 'Y') 
+                                  order by   dev.id_grupo,dev.cod_emp,dev.local,dev.dt_ref,dev.dt_doc,dev.nro_item
+
+                LOOP            
+               
+                    //RAISE NOTICE  'Nota % ', sai_dev.sai_nro_doc;
+                
+                    if (sai_dev.sai_nro_doc is null) 
+                         then
+                            UPDATE public.nfe_det_trade SET id_operacao = 'y'
+                            WHERE id_grupo = sai_dev.dev_id_grupo and id_planilha = sai_dev.dev_id_planilha and nro_linha = sai_dev.dev_nro_linha ;
+                         else 
+                            select _id_saida, _nro_linha from seek_dev_saida2(
                                 _grupo               ,
                                 _cod_emp              ,
                                 _local                  ,
@@ -717,7 +846,7 @@ select * from
                               WHERE id_grupo = sai_dev.dev_id_grupo and id_planilha = sai_dev.dev_id_planilha and nro_linha = sai_dev.dev_nro_linha ;
                              _qtd_dev := _qtd_dev + 1;
                             else
-                              UPDATE public.nfe_det_trade SET id_operacao = 'z'
+                              UPDATE public.nfe_det_trade SET id_operacao = 'y'
                               WHERE id_grupo = sai_dev.dev_id_grupo and id_planilha = sai_dev.dev_id_planilha and nro_linha = sai_dev.dev_nro_linha ;
                             end if;
                    end if;
@@ -728,6 +857,7 @@ select * from
     $$
     LANGUAGE 'plpgsql'
     go
+
 
 
     /*
@@ -893,11 +1023,13 @@ select * from
      vlr_economico_pis_corrigido    numeric(15,4);
      vlr_economico_cofins_corrigido numeric(15,4);
      taxa numeric(6,2);
-     data_inicial _data    := Date '2017-03-16';
+     data_inicial  Date ;
 
     BEGIN
 
-            Comentarios := true;
+            data_inicial  := Date '2017-03-16';
+
+            Comentarios   := true;
 
             _saida := 0;
 

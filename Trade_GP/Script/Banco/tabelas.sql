@@ -178,7 +178,7 @@ CREATE TABLE public.nfe_cab_trade  (
 	status            	int4 NULL,
 	ultima            	int4 NULL,
 	layout              char(1) NOT NULL DEFAULT  'S',
-    resumo_5405         char(1) NOT NULL DEFAULT  'N'
+    resumo_5405         char(1) NOT NULL DEFAULT  'N',
 	PRIMARY KEY(id_grupo,id)
 )
 WITHOUT OIDS 
@@ -414,6 +414,8 @@ WITHOUT OIDS
 TABLESPACE "Producao"
 GO
 
+
+
 DROP TABLE IF EXISTS resumo_5405;
 CREATE TABLE public.resumo_5405  ( 
     id_grupo       int4 NOT NULL,
@@ -423,11 +425,13 @@ CREATE TABLE public.resumo_5405  (
     descricao      varchar(150) NOT NULL,
     unid           char(05) NOT NULL,
     fator          numeric(06,2) NOT NULL ,
-	PRIMARY KEY(id_grupo,cod_emp,local,material)
+    dt_ref         date NOT NULL,
+	PRIMARY KEY(id_grupo,cod_emp,local,material,unid)
 )
 WITHOUT OIDS 
 TABLESPACE "Producao"
 GO
+
 
 
 DROP TABLE IF EXISTS DE_PARA;

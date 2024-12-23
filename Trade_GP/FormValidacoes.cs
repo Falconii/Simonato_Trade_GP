@@ -468,6 +468,8 @@ namespace Trade_GP
 
             int _qtd_dev = 0;
 
+            int _qtd_devs = 0;
+
             //pgProcesso.Value = 0;
 
             daoNfeDetTrade daoDet = new daoNfeDetTrade();
@@ -495,6 +497,19 @@ namespace Trade_GP
                 {
                     MessageBox.Show($"Erro: {ex.Message}");
                 }
+                try
+                {
+
+                    _qtd_devs = await daoDet.Check_Devolucao2(UsuarioSistema.Id_Grupo, cod_emp, local, Periodo);
+
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Erro: {ex.Message}");
+                }
+
+                _qtd_dev += _qtd_devs;
+
                 tar.Final = DateTime.Now;
 
                 TimeSpan tempo = (TimeSpan)(tar.Final - tar.Inicial);

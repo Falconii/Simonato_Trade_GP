@@ -246,14 +246,65 @@ namespace Trade_GP.Dao.postgre
 
         }
 
+        public async Task<int> Check_Devolucao2(int id_grupo, string cod_emp, string local, string periodo)
+        {
+
+            int Nro_Dev = 0;
+
+            String StringProc = $"select * from check_devolucao2({id_grupo},'{cod_emp}','{local}','{periodo}');";
+
+
+            string strStringConexao = DataBase.RunCommand.connectionString;
+
+            await Task.Run(() =>
+            {
+                using (var objConexao = new NpgsqlConnection(strStringConexao))
+                {
+                    using (var objCommand = new NpgsqlCommand(StringProc, objConexao))
+                    {
+                        try
+                        {
+                            objConexao.Open();
+
+                            var objDataReader = objCommand.ExecuteReader();
+
+                            if (objDataReader.HasRows)
+                            {
+
+                                while (objDataReader.Read())
+                                {
+
+                                    Nro_Dev = Convert.ToInt32(objDataReader["_qtd_dev"]);
+
+                                }
+                            }
+
+                        }
+                        catch (Exception ex)
+                        {
+                            MessageBox.Show(ex.Message, "Atenção!");
+
+                            Nro_Dev = -1;
+                        }
+                        finally
+                        {
+                            objConexao.Dispose();
+                        }
+                    }
+                }
+
+            });
+
+            return Nro_Dev;
+
+        }
+
         public async Task<int> Processou_Devolucao(int id_grupo, string cod_emp, string local, string periodo)
         {
 
             int total = 0;
 
-            String StringProc = $"SELECT COUNT(*) AS TOTAL FROM nfe_det_trade dev where dev.id_grupo = '{id_grupo}' and dev.cod_emp = '{cod_emp}' and dev.local = '{local}' and dev.id_operacao = 'Z' and to_char(dev.dt_ref,'MM/YYYY') = '{periodo}' and dev.dt_ref >= '2016-12-01' AND dev.id_saida = 0;";
-
-
+            String StringProc = $"SELECT COUNT(*) AS TOTAL FROM nfe_det_trade dev where dev.id_grupo = '{id_grupo}' and dev.cod_emp = '{cod_emp}' and dev.local = '{local}' and (dev.id_operacao = 'Z' or dev.id_operacao = 'Y') and to_char(dev.dt_ref,'MM/YYYY') = '{periodo}' and dev.dt_ref >= '2017-03-16' AND dev.id_saida = 0;";
 
             string strStringConexao = DataBase.RunCommand.connectionString;
 

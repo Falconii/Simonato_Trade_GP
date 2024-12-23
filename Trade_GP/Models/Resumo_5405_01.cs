@@ -8,10 +8,13 @@ namespace Trade_GP.Models
 {
     public class Resumo_5405_01
     {
+        
+
         public string material { get; set; }
         public string descricao { get; set; }
         public string unid     { get; set; }
         public double fator    { get; set; }
+        public DateTime dt_ref  {get; set; }
 
         public Resumo_5405_01()
         {
@@ -26,6 +29,7 @@ namespace Trade_GP.Models
             this.descricao = "";
             this.unid = "";
             this.fator = 0;
+            this.dt_ref = DateTime.Now;
         }
     }
 }
