@@ -2,7 +2,7 @@
      Triggers e Funções
 
      Trade GP 
-
+     
     */
 
     /*
@@ -193,6 +193,8 @@
 
                _saldo_f := _saldo_s;
 
+               RAISE NOTICE 'Saldo Final % ',_saldo_f;
+
               //atualizacao feita pela trigger
               //Atualiza nota e
               //update nfe_det_trade set saldo = _saldo_e where id_grupo = entrada.id_grupo and id_planilha = entrada.id_planilha and nro_linha = entrada.nro_linha;
@@ -233,8 +235,66 @@
 		alternativo     text
     );
 
-   DROP FUNCTION IF EXISTS public.calculo_saldov2(integer, text, text, text, integer);
-    CREATE OR REPLACE FUNCTION public.calculo_saldov2(
+CREATE OR REPLACE FUNCTION public.seek_saida_2(_id_grupo integer, _cod_empresa text, _local text, _id_d integer, _nro_linha_d integer, _material_d text, _qtd_d numeric, _dt_ref_d date, _id_s integer, _nro_linha_s integer, _id_fechamento integer, OUT _saldo_f numeric)
+ RETURNS numeric
+ LANGUAGE plpgsql
+ AS $function$
+    DECLARE
+
+    controle  public.controle_e%ROWTYPE;
+    _saldo_e numeric(15,4);
+    _qtd_abatida numeric(15,4);
+    _last    date;
+    _hoje    date;
+
+    BEGIN
+
+        _saldo_f = 0;
+
+        
+         
+
+        _qtd_abatida := _qtd_d;
+
+         FOR controle in  
+     
+          SELECT *
+          FROM   controle_e CONTROL 
+          WHERE  CONTROL.id_grupo = _id_grupo and CONTROL.id_fechamento = _id_fechamento and CONTROL.id_s = _id_s and CONTROL.nro_linha_s = _nro_linha_s
+          ORDER BY  CONTROL.id_grupo , CONTROL.id_fechamento , CONTROL.id_s , CONTROL.nro_linha_s 
+          LOOP      
+                        
+
+              IF (_qtd_abatida > 0 ) THEN 
+
+                    IF ( _qtd_abatida >= controle.qtd_e ) THEN
+
+                        UPDATE controle_e set  qtd_d = qtd_e , qtd_e = 0 
+                        
+                        where id_grupo = _id_grupo and id_fechamento = _id_fechamento and id_s = _id_s and nro_linha_s = _nro_linha_s;
+
+                        _qtd_abatida := _qtd_abatida - controle.qtd_e;
+
+                    ELSE
+
+                       UPDATE controle_e set qtd_d = qtd_e - _qtd_abatida,  qtd_e = qtd_e - _qtd_abatida  where id_grupo = _id_grupo and id_fechamento = _id_fechamento and id_s = _id_s and nro_linha_s = _nro_linha_s;
+
+                        _qtd_abatida := 0;
+
+                   END IF;
+
+             END IF;
+          END LOOP;
+          INSERT INTO controle_e(id_grupo,id_fechamento,id_s, nro_linha_s, id_e, nro_linha_e, qtd_s, qtd_e, qtd_d,flag) 	
+            VALUES(_id_grupo,_id_fechamento,_id_s, _nro_linha_s,_id_d , _nro_linha_d, 0, 0 , _qtd_d, 'D');
+      
+    END;
+    $function$
+    ;
+
+
+DROP FUNCTION IF EXISTS public.calculo_saldov2(integer, text, text, text, integer);
+CREATE OR REPLACE FUNCTION public.calculo_saldov2(
 	    _id_grupo integer,
 	    _cod_emp text,
 	    _local text,
@@ -275,18 +335,18 @@
           FROM   nfe_det_trade DET
           LEFT  JOIN de_para     depara on depara.id_grupo = det.id_grupo and depara.cod_emp = det.cod_emp and depara.local = det.local and depara.de_material = det.material
           WHERE  DET.id_grupo = _id_grupo and DET.cod_emp = _cod_emp and Det.local = _local and 
-                 ( ( ((det.id_operacao = 'S') OR (det.id_operacao = 's')) and det.status = '0'  ) OR ((det.id_operacao = 'Z') OR (det.id_operacao = 'Y'))  and det.status = '0'))
-                 and (TO_CHAR(det.dt_ref,'DD/MM/YYYY') = _mes_ano)  
-          ORDER BY DET.id_grupo,DET.cod_emp,DET.local,DET.dt_ref , DET.id_operacao desc ,DET.nro_doc,DET.nro_item 
+                 ( 
+                   ( ((det.id_operacao = 'S') OR (det.id_operacao = 's'))  and det.status = '0') 
+                   OR 
+                   ( ((det.id_operacao = 'Z') OR (det.id_operacao = 'Y'))  and det.status = '0')
+                 )
+                 and (TO_CHAR(det.dt_ref,'DD/MM/YYYY') = _mes_ano) 
+           ORDER BY DET.id_grupo,DET.cod_emp,DET.local,DET.dt_ref , DET.id_operacao desc ,DET.nro_doc,DET.nro_item 
 
           LOOP      
-             
-
-           
-
-               IF (tempo.id_operacao = 'Z') then
- 
-               
+                     
+               IF ((tempo.id_operacao = 'Z') OR (tempo.id_operacao = 'Y')) then
+                
                    select _saldo_f from seek_saida_2(tempo.id_grupo,tempo.cod_emp,tempo.local,tempo.id_planilha,tempo.nro_linha,tempo.material,tempo.qtd_convertida,tempo.dt_ref,tempo.id_saida,tempo.nro_linha_saida,_id_fechamento) into __saldo_f ;
                    update nfe_det_trade set status = '1' where id_grupo = tempo.id_grupo and id_planilha = tempo.id_planilha and nro_linha = tempo.nro_linha;
 
@@ -304,40 +364,32 @@
 
                       end if;
 
-                      select __saldo_f from seek_in_2V2(tempo.id_grupo,tempo.id_planilha,tempo.nro_linha,tempo.cod_emp,tempo.local,tempo.material,tempo.dt_ref,tempo.saldo,_id_fechamento) into __saldo_f ;
-                      
-                      if (__saldo_f > 0  and tempo.alternativo <> '') then 
-
-                         select _saldo_f from seek_in_2V2(tempo.id_grupo,tempo.id_planilha,tempo.nro_linha,tempo.cod_emp,tempo.local,tempo.alternativo,tempo.dt_ref,__saldo_f,_id_fechamento) into __saldo_f ;
-
-                      end if;
-
                       update nfe_det_trade set saldo = __saldo_f , status = '1' where id_grupo = tempo.id_grupo and id_planilha = tempo.id_planilha and nro_linha = tempo.nro_linha;
 
                   else 
                   
-                     
-                      //RAISE NOTICE 'Passei 002';
-                      
-                      
-                      //RAISE NOTICE 'tempo.material % tempo.dt_ref % tempo.saldo %',tempo.material , tempo.dt_ref , tempo.saldo;
-                  
+                      /RAISE NOTICE 'Primeiro tempo.material % tempo.dt_ref % tempo.saldo %',tempo.material , tempo.dt_ref , tempo.saldo;
+
                       select _saldo_f from seek_in_2V2(tempo.id_grupo,tempo.id_planilha,tempo.nro_linha,tempo.cod_emp,tempo.local,tempo.material,tempo.dt_ref,tempo.saldo,_id_fechamento) into __saldo_f ;
                       
+                      //RAISE NOTICE 'Segundo tempo.material % tempo.dt_ref % __saldo_f %',tempo.material , tempo.dt_ref , __saldo_f;
+
                        if (__saldo_f > 0  and tempo.alternativo <> '') then 
 
                          select _saldo_f from seek_in_2V2(tempo.id_grupo,tempo.id_planilha,tempo.nro_linha,tempo.cod_emp,tempo.local,tempo.alternativo,tempo.dt_ref,__saldo_f,_id_fechamento) into __saldo_f ;
 
-                      end if;
-
-                      select __saldo_f from seek_in_2V1(tempo.id_grupo,tempo.id_planilha,tempo.nro_linha,tempo.cod_emp,tempo.local,tempo.material,tempo.dt_ref,tempo.saldo,_id_fechamento) into __saldo_f ;
-
-                      if (__saldo_f > 0  and tempo.alternativo <> '') then 
-                      
-                         select _saldo_f from seek_in_2V1(tempo.id_grupo,tempo.id_planilha,tempo.nro_linha,tempo.cod_emp,tempo.local,tempo.alternativo,tempo.dt_ref,__saldo_f,_id_fechamento) into __saldo_f ;
+                         / NOTICE 'terceiro tempo.material % tempo.dt_ref % __saldo_f %',tempo.material , tempo.dt_ref , __saldo_f;
 
                       end if;
+                      if (__saldo_f > 0) then
+                        select _saldo_f from seek_in_2V1(tempo.id_grupo,tempo.id_planilha,tempo.nro_linha,tempo.cod_emp,tempo.local,tempo.material,tempo.dt_ref,__saldo_f,_id_fechamento) into __saldo_f ;
+                        // NOTICE 'Quarto tempo.material % tempo.dt_ref % __saldo_f %',tempo.material , tempo.dt_ref , __saldo_f;
+                        if (__saldo_f > 0  and tempo.alternativo <> '') then 
                       
+                            select _saldo_f from seek_in_2V1(tempo.id_grupo,tempo.id_planilha,tempo.nro_linha,tempo.cod_emp,tempo.local,tempo.alternativo,tempo.dt_ref,__saldo_f,_id_fechamento) into __saldo_f ;
+                            //RAISE NOTICE 'quinto tempo.material % tempo.dt_ref % __saldo_f %',tempo.material , tempo.dt_ref , __saldo_f;
+                        end if;
+                      end if;
                       update nfe_det_trade set saldo = __saldo_f , status = '1' where id_grupo = tempo.id_grupo and id_planilha = tempo.id_planilha and nro_linha = tempo.nro_linha;
                       
                   end if;
@@ -887,7 +939,7 @@ select * from
        IF  (TG_OP = 'INSERT') THEN
            // NFE ENTRADA
            if (new.flag = 'D') then 
-                RAISE NOTICE  'Inclusao D  NEW.qtd_d % NEW.id_grupo % NEW.id_s %  NEW.nro_linha_s % ',NEW.qtd_d , NEW.id_grupo , NEW.id_s ,  NEW.nro_linha_s  ;
+                //RAISE NOTICE  'Inclusao D  NEW.qtd_d % NEW.id_grupo % NEW.id_s %  NEW.nro_linha_s % ',NEW.qtd_d , NEW.id_grupo , NEW.id_s ,  NEW.nro_linha_s  ;
                 update nfe_det_trade set qtd_dev = qtd_dev + NEW.qtd_d where id_grupo = NEW.id_grupo and id_planilha = NEW.id_s and nro_linha = NEW.nro_linha_s;
            else 
                 _data    := Date '2017-02-28';

@@ -39,7 +39,9 @@ namespace Trade_GP
 
         private void FormImplacaoSaldo_Load(object sender, EventArgs e)
         {
+            btProximoFlag = false;
 
+            status_inical();
         }
 
         private void FormImplacaoSaldo_Activated(object sender, EventArgs e)
@@ -359,7 +361,6 @@ namespace Trade_GP
 
             foreach (tarefa tar in lsTarefas)
             {
-
 
                 lblLocalPeriodo.Text = $"Local {local} - Lote {tar.Sequencia} ";
                 i++;

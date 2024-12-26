@@ -36,7 +36,7 @@ namespace Trade_GP.Dao.postgre
 
             string strStringConexao = DataBase.RunCommand.connectionString;
 
-            string strSelect = $"select coalesce(count(*),0) as total from saldo_inicial where id_grupo = {id_grupo} and cod_emp = '{cod_emp}' and local = '{local}' and status = '0' ";
+            string strSelect = $"select coalesce(count(*),0) as total from saldo_inicial where id_grupo = {id_grupo} and cod_emp = '{cod_emp}' and local = '{local}' and fator <> 0 and status = '0' ";
 
             Console.WriteLine(strSelect);
 
