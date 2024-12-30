@@ -126,6 +126,8 @@ namespace Trade_GP.Util
                         {
                             try
                             {
+                                fields[0] = fields[0].Replace("\"","");
+
                                 fields[1] = Regex.Replace(fields[1], "[A-Za-z]", "0");
 
                                 DateTime dt_ref;
@@ -142,19 +144,30 @@ namespace Trade_GP.Util
                                 {
                                     if (!DateTime.TryParseExact(fields[11], "dd/MM/yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out dt_ref))
                                     {
-                                        throw new Exception("Data inválida em fields[11]!");
+                                        ContadorLinhas++;
+
+                                        continue;
                                     }
                                 }
                                 else if ("567".Contains(fields[12].Substring(0, 1)))
                                 {
                                     if (!DateTime.TryParseExact(fields[10], "dd/MM/yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out dt_ref))
                                     {
-                                        throw new Exception("Data inválida em fields[10]!");
+                                        ContadorLinhas++;
+
+                                        Console.WriteLine(line);
+
+                                        continue;
                                     }
                                 }
                                 else
                                 {
-                                    throw new Exception("CFOP inválido!");
+
+                                    ImportacaoAsync.StaticLsErrosImportacao.Add(new ErrosImportacao("E", fileName, ContadorLinhas.ToString(), "CPOP", fields[12] , 0, "Excesso De Erros No Arquivo"));
+
+                                    ContadorLinhas++;
+
+                                    continue;
                                 }
 
                                 if (!loadMaterais)
@@ -219,10 +232,8 @@ namespace Trade_GP.Util
 
                                 Cabecalho.Layout = fields.Count == 51 ? "S" : "C";
 
-                                if (ContadorLinhas == 1)
-                                {
-                                    if (Cabecalho.Id == 0)
-                                    {
+                                if (Cabecalho.Id == 0)
+                                 {
                                         daoNfeCabTrade daoCabec = new daoNfeCabTrade();
 
                                         NfeCabTrade Cabec = daoCabec.Insert(Cabecalho);
@@ -235,8 +246,7 @@ namespace Trade_GP.Util
                                         }
 
                                         Cabecalho.Id = Cabec.Id;
-                                    }
-                                }
+                                 }
                             }
 
 
