@@ -359,7 +359,7 @@ namespace Trade_GP
                 foreach (var par in Parametros)
                 {
 
-                    pgProcesso.Value = rowMeses+1;
+                    pgProcesso.Value = 1; // rowMeses+1;
 
                     getMeses();
 
@@ -398,6 +398,9 @@ namespace Trade_GP
                         return;
                     }
 
+
+
+                    rowMeses = 0;
 
                     foreach (var mes in lsMeses)
                     {

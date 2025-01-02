@@ -420,7 +420,7 @@ CREATE OR REPLACE FUNCTION public.calculo_saldov2(
 
 -- DROP FUNCTION public.seek_entrada_saldo(in int4, in text, in text, in text, in numeric, in int4, out numeric);
 
-CREATE OR REPLACE FUNCTION public.seek_entrada_saldo(_id_grupo integer, _cod_empresa text, _local text, _material text, _saldo_s numeric, _id_fechamento integer, OUT _saldo_f numeric)
+CREATE OR REPLACE FUNCTION public.seek_entrada_saldo(in _id_grupo integer, in _cod_empresa text, in _local text, in _material text, in _oficial text, in _saldo_s numeric, in _id_fechamento integer, OUT _saldo_f numeric)
  RETURNS numeric
  LANGUAGE plpgsql
 AS $function$
@@ -448,9 +448,6 @@ AS $function$
            ORDER BY ENT.cod_emp,ENT.local,ENT.material,ENT.dt_ref desc, ENT.id_operacao desc
         LOOP     
            
-               
-
-               
 
                _saldo_e := entrada.saldo;
 
@@ -474,8 +471,12 @@ AS $function$
                END IF;
 
                _saldo_f := _saldo_s;
+
+
+               /*RAISE NOTICE 'Qtd _qtd % _saldo_f % _material % ', _qtd, _saldo_f, _material;*/
+
                          
-              INSERT INTO controle_s(id_grupo,id_fechamento,cod_emp,local,material,id_e, nro_linha_e, qtd_e ,qtd_s) VALUES(_id_grupo,_id_fechamento,_cod_empresa, _local,_material, entrada.id_planilha , entrada.nro_linha, _qtd ,_saldo_f);
+              INSERT INTO controle_s(id_grupo,id_fechamento,cod_emp,local,material,id_e, nro_linha_e, qtd_e ,qtd_s) VALUES(_id_grupo,_id_fechamento,_cod_empresa, _local,_oficial, entrada.id_planilha , entrada.nro_linha, _qtd ,_saldo_f);
   
               IF (_saldo_f = 0) THEN
 
@@ -489,8 +490,7 @@ AS $function$
     $function$
 ;
 
-    
-DROP FUNCTION IF EXISTS calculo_saldo_inicial;
+ DROP FUNCTION IF EXISTS calculo_saldo_inicial;
 CREATE OR REPLACE FUNCTION "public"."calculo_saldo_inicial" (in _id_grupo int4, in _cod_emp text, in _local text , in _id_fechamento int, out _saida int) 
     RETURNS int
     AS
@@ -517,10 +517,10 @@ CREATE OR REPLACE FUNCTION "public"."calculo_saldo_inicial" (in _id_grupo int4, 
 
           LOOP      
           
-                 RAISE NOTICE 'Cheguei Aqui!!';
+                 /*RAISE NOTICE 'Cheguei Aqui!! reg % ', tempo;*/
                  _status = '0';
              
-                 select _saldo_f from seek_entrada_saldo(tempo.id_grupo,tempo.cod_emp,tempo.local,tempo.material,tempo.saldo_ini_conv,_id_fechamento) into __saldo_f ;
+                 select _saldo_f from seek_entrada_saldo(tempo.id_grupo,tempo.cod_emp,tempo.local,tempo.material,tempo.material,tempo.saldo_ini_conv,_id_fechamento) into __saldo_f ;
             
                  if (__saldo_f = 0) then
                     _status = '1';
@@ -534,7 +534,7 @@ CREATE OR REPLACE FUNCTION "public"."calculo_saldo_inicial" (in _id_grupo int4, 
          
                  if ((__saldo_f > 0) and (tempo.alternativo != '')) then
                  
-                     select _saldo_f from seek_entrada_saldo(tempo.id_grupo,tempo.cod_emp,tempo.local,tempo.alternativo,__saldo_f,_id_fechamento) into __saldo_f ;
+                     select _saldo_f from seek_entrada_saldo(tempo.id_grupo,tempo.cod_emp,tempo.local,tempo.alternativo,tempo.material,__saldo_f,_id_fechamento) into __saldo_f ;
                      if (__saldo_f = 0) then
                         _status = '1';
                      else    
@@ -558,7 +558,7 @@ CREATE OR REPLACE FUNCTION "public"."calculo_saldo_inicial" (in _id_grupo int4, 
     $$
     LANGUAGE 'plpgsql'
     go
-
+   
     /*
     
  select * from public.resumo_5405 where local = '0002'
@@ -1969,7 +1969,7 @@ CREATE OR REPLACE FUNCTION "public"."importa_sld_excel"(
        select saldo_inicial from saldo_inicial into _saldo_inicial where id_grupo = _id_grupo and cod_emp = _cod_empresa and local = _local and material = _material;
     
        if (_saldo_inicial is null) then
-           RAISE NOTICE  'Saldo Inicial Não Encontrado ';
+           //RAISE NOTICE  'Saldo Inicial Não Encontrado ';
            INSERT INTO saldo_inicial(id_grupo,cod_emp,local,material,descricao,saldo_inicial,saldo_ini_conv,saldo_imp_conv,fator,ct,status) 
            values (
             _id_grupo     ,
@@ -1980,7 +1980,7 @@ CREATE OR REPLACE FUNCTION "public"."importa_sld_excel"(
             _saldo        ,
             0,0,0,1,'0');
        else 
-           RAISE NOTICE  'Saldo Inicial % ',_saldo_inicial;
+           //RAISE NOTICE  'Saldo Inicial % ',_saldo_inicial;
            update  public.saldo_inicial set saldo_inicial = saldo_inicial + _saldo,  ct = ct + 1
            where id_grupo = _id_grupo and cod_emp = _cod_empresa and local = _local and material = _material ;
        end if;
