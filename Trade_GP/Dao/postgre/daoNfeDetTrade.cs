@@ -469,10 +469,22 @@ namespace Trade_GP.Dao.postgre
         {
 
             int Nro_Notas = 0;
-
+            /*
             String StringProc = "SELECT COALESCE(COUNT(*),0) AS TOTAL " +
                                 "FROM nfe_det_trade DET  " +
                                 $"WHERE  DET.id_grupo = {id_grupo} and DET.cod_emp = '{cod_emp}'  and Det.local  = '{local}' and((det.id_operacao = 'S' and det.status = '0') OR(det.id_operacao = 'Z' and det.status = '0')) and(TO_CHAR(det.dt_ref, 'MM/YYYY') = '{periodo}')";
+            */
+
+            String StringProc = "SELECT COALESCE(COUNT(det.*),0) AS TOTAL " +
+            " FROM nfe_det_trade DET " +
+            " LEFT  JOIN de_para     depara on depara.id_grupo = det.id_grupo and depara.cod_emp = det.cod_emp and depara.local = det.local and depara.de_material = det.material " +
+            $" WHERE DET.id_grupo = {id_grupo} and DET.cod_emp = '{cod_emp}' and Det.local = '{local}' and " +
+            "   ( " +
+            "       (((det.id_operacao = 'S') OR(det.id_operacao = 's'))  and det.status = '0') " +
+            "        OR " +
+            "       (((det.id_operacao = 'Z') OR(det.id_operacao = 'Y'))  and det.status = '0') " +
+            "   ) " +
+            $"   and(TO_CHAR(det.dt_ref, 'MM/YYYY') = '{periodo}') ";
 
             string strStringConexao = DataBase.RunCommand.connectionString;
 

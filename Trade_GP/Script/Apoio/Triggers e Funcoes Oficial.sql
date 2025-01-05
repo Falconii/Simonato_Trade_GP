@@ -368,7 +368,7 @@ CREATE OR REPLACE FUNCTION public.calculo_saldov2(
 
                   else 
                   
-                      /RAISE NOTICE 'Primeiro tempo.material % tempo.dt_ref % tempo.saldo %',tempo.material , tempo.dt_ref , tempo.saldo;
+                      //RAISE NOTICE 'Primeiro tempo.material % tempo.dt_ref % tempo.saldo %',tempo.material , tempo.dt_ref , tempo.saldo;
 
                       select _saldo_f from seek_in_2V2(tempo.id_grupo,tempo.id_planilha,tempo.nro_linha,tempo.cod_emp,tempo.local,tempo.material,tempo.dt_ref,tempo.saldo,_id_fechamento) into __saldo_f ;
                       
@@ -378,7 +378,7 @@ CREATE OR REPLACE FUNCTION public.calculo_saldov2(
 
                          select _saldo_f from seek_in_2V2(tempo.id_grupo,tempo.id_planilha,tempo.nro_linha,tempo.cod_emp,tempo.local,tempo.alternativo,tempo.dt_ref,__saldo_f,_id_fechamento) into __saldo_f ;
 
-                         / NOTICE 'terceiro tempo.material % tempo.dt_ref % __saldo_f %',tempo.material , tempo.dt_ref , __saldo_f;
+                         //raise NOTICE 'terceiro tempo.material % tempo.dt_ref % __saldo_f %',tempo.material , tempo.dt_ref , __saldo_f;
 
                       end if;
                       if (__saldo_f > 0) then

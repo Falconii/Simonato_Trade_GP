@@ -311,6 +311,7 @@ namespace Trade_GP
 
                 status_processado();
 
+                MessageBox.Show("Fim Do Processamento!", "Atenção!");
 
                 return;
             }
@@ -392,10 +393,13 @@ namespace Trade_GP
                 {
                     tar.Observacao = "Cancelamento Solicitado !";
                 }
-                dtGridLog.InvalidateCell(2, i - 1);
-                dtGridLog.InvalidateCell(3, i-1);
-                dtGridLog.InvalidateCell(4, i-1);
-                dtGridLog.InvalidateCell(5, i-1);
+                if (i > 0)
+                {
+                    dtGridLog.InvalidateCell(2, i-1);
+                    dtGridLog.InvalidateCell(3, i-1);
+                    dtGridLog.InvalidateCell(4, i-1);
+                    dtGridLog.InvalidateCell(5, i-1);
+                }
 
                 if (Cancelar) break;
 

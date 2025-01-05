@@ -276,6 +276,8 @@ namespace Trade_GP
 
                 int resultado = -1;
 
+                DateTime tempoInicial = DateTime.Now;
+
                 foreach (var par in Parametros)
                 {
                     getMeses();
@@ -326,7 +328,7 @@ namespace Trade_GP
                         if (mes.Registros > 0)
                         {
                             NewTarefas(mes.Mes);
-
+                            
                             resultado = await processamento(UsuarioSistema.Id_Grupo, par.Cod_Emp, par.Local);
 
                             if (Cancelar)
@@ -364,6 +366,14 @@ namespace Trade_GP
 
                 status_processado();
 
+
+                DateTime tempoFinal = DateTime.Now;
+
+                TimeSpan tempo = (TimeSpan)(tempoFinal - tempoInicial);
+
+                string tempoDecorrido = String.Format("{0:00}:{1:00}:{2:00}", tempo.Hours, tempo.Minutes, tempo.Seconds);
+
+                MessageBox.Show($"Tempo Decorrido Total : {tempoDecorrido}");
 
                 return;
             }
@@ -417,7 +427,6 @@ namespace Trade_GP
             foreach (tarefa tar in lsTarefas)
             {
 
-
                 lblLocalPeriodo.Text = $"Local {local} - Data {tar.Periodo.Trim()} ";
                 i++;
                 //lblProcesso.Text = $"Processando {i}/{lsTarefas.Count}";
@@ -438,9 +447,16 @@ namespace Trade_GP
                 {
                     MessageBox.Show($"Erro: {ex.Message}");
                 }
+
                 tar.Final = DateTime.Now;
-                tar.Status = "Processado !!!";
-                tar.Observacao = $"Total De Notas{_saida}";
+
+                TimeSpan tempoDia = (TimeSpan)(tar.Final - tar.Inicial);
+
+                string elapsedTime = String.Format("{0:00}:{1:00}:{2:00}", tempoDia.Hours, tempoDia.Minutes, tempoDia.Seconds);
+
+                tar.Status = $"Processado {elapsedTime}";
+
+                tar.Observacao = $"Total De Notas {_saida}";
 
                 if (Cancelar)
                 {
