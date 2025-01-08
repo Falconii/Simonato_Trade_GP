@@ -267,7 +267,6 @@ namespace Trade_GP
 
             Boolean ErroPlanilhaOpen = false;
 
-
             string Path = $"{tbFolder.Text}\\";
 
             string FileName = "";

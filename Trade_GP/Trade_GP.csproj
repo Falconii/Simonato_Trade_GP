@@ -373,6 +373,7 @@
     <WCFMetadata Include="Connected Services\" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Script\Apoio\gerar acumulado.sql" />
     <Content Include="Script\Apoio\implantacao de saldo 1004 0001.sql" />
     <Content Include="Script\reavaliar\calculo_saldov2.sql" />
     <Content Include="Script\reavaliar\nova devolucao.sql" />

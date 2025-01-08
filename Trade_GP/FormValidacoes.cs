@@ -343,6 +343,8 @@ namespace Trade_GP
 
             if ((int)btProcessar.Tag == 0) // Processamento
             {
+                DateTime tempoInicial = DateTime.Now;
+
                 Cancelar = false;
 
                 lblProcesso.Text = "Locais";
@@ -426,6 +428,14 @@ namespace Trade_GP
 
                 status_processado();
 
+                DateTime tempoFinal = DateTime.Now;
+
+                TimeSpan tempo = (TimeSpan)(tempoFinal - tempoInicial);
+
+                string tempoDecorrido = String.Format("{0:00}:{1:00}:{2:00}", tempo.Hours, tempo.Minutes, tempo.Seconds);
+
+                MessageBox.Show($"Tempo Decorrido Total : {tempoDecorrido}");
+
                 return;
             }
             if ((int)btProcessar.Tag == 1) // Cancelamento
@@ -493,7 +503,7 @@ namespace Trade_GP
                 try
                 {
 
-                    _qtd_dev = await daoDet.Check_Devolucao(UsuarioSistema.Id_Grupo, cod_emp, local, Periodo);
+                    _qtd_dev = await daoDet.Check_Devolucaox(UsuarioSistema.Id_Grupo, cod_emp, local, Periodo);
 
                 }
                 catch (Exception ex)
@@ -503,7 +513,7 @@ namespace Trade_GP
                 try
                 {
 
-                    _qtd_devs = await daoDet.Check_Devolucao2(UsuarioSistema.Id_Grupo, cod_emp, local, Periodo);
+                    _qtd_devs = await daoDet.Check_Devolucao2x(UsuarioSistema.Id_Grupo, cod_emp, local, Periodo);
 
                 }
                 catch (Exception ex)
@@ -555,6 +565,9 @@ namespace Trade_GP
 
             return 1;
         }
+
+
+
         private void status_inical()
         {
             gbMensaProcessamento.Visible = false;
@@ -697,7 +710,7 @@ namespace Trade_GP
 
                 try
                 {
-                    _qtd_dev = await daoDet.Check_Devolucao(UsuarioSistema.Id_Grupo, cod_emp, local, Periodo);
+                    _qtd_dev = await daoDet.Check_Devolucaox(UsuarioSistema.Id_Grupo, cod_emp, local, Periodo);
                 }
                 catch (Exception ex)
                 {

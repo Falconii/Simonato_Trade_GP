@@ -395,10 +395,12 @@ namespace Trade_GP
                 }
                 if (i > 0)
                 {
+                    /*
                     dtGridLog.InvalidateCell(2, i-1);
                     dtGridLog.InvalidateCell(3, i-1);
                     dtGridLog.InvalidateCell(4, i-1);
                     dtGridLog.InvalidateCell(5, i-1);
+                    */
                 }
 
                 if (Cancelar) break;

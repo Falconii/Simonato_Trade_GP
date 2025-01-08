@@ -193,12 +193,12 @@ namespace Trade_GP.Dao.postgre
             }
             */
         }
-        public async Task<int> Check_Devolucao(int id_grupo, string cod_emp, string local, string periodo)
+        public async Task<int> Check_Devolucaox(int id_grupo, string cod_emp, string local, string periodo)
         {
 
             int Nro_Dev = 0;
 
-            String StringProc = $"select * from check_devolucao({id_grupo},'{cod_emp}','{local}','{periodo}');";
+            String StringProc = $"select * from check_devolucaox({id_grupo},'{cod_emp}','{local}','{periodo}');";
 
 
             string strStringConexao = DataBase.RunCommand.connectionString;
@@ -246,12 +246,12 @@ namespace Trade_GP.Dao.postgre
 
         }
 
-        public async Task<int> Check_Devolucao2(int id_grupo, string cod_emp, string local, string periodo)
+        public async Task<int> Check_Devolucao2x(int id_grupo, string cod_emp, string local, string periodo)
         {
 
             int Nro_Dev = 0;
 
-            String StringProc = $"select * from check_devolucao2({id_grupo},'{cod_emp}','{local}','{periodo}');";
+            String StringProc = $"select * from check_devolucao2x({id_grupo},'{cod_emp}','{local}','{periodo}');";
 
 
             string strStringConexao = DataBase.RunCommand.connectionString;
