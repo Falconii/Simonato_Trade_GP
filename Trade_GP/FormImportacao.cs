@@ -121,13 +121,7 @@ namespace Trade_GP
                 if (totais.Saida > 0 && totais.Entrada == 0)
                 {
                     cbCPFO.SelectedIndex = 0;
-                }
-                if (totais.Saida == 0 && totais.Entrada > 0)
-                {
-                    cbCPFO.SelectedIndex = 1;
-                }
-                if (totais.Saida > 0 && totais.Entrada > 0)
-                {
+                } else { 
                     cbCPFO.SelectedIndex = 1;
                 }
             }
@@ -338,7 +332,7 @@ namespace Trade_GP
                 {
                     if (EntradaSaida != "S")
                     {
-                        ImportacaoAsync.StaticLsErrosImportacao.Add(new ErrosImportacao("W", FileName, "", "", "", 0, "Arquivo Não Compativel Com A Opção"));
+                        ImportacaoAsync.StaticLsErrosImportacao.Add(new ErrosImportacao("W", FileName, "", "", "", 0, "Arquivo Não Compativel Com A Opção, Escolha Apenas Saidas"));
                     }
                     else
                     {
@@ -358,9 +352,13 @@ namespace Trade_GP
                     {
                         ImportacaoAsync.StaticLsErrosImportacao.Add(new ErrosImportacao("W", FileName, "", "", "", 0, "Planilha Aberta Por Outra Aplicação"));
                     }
-                    if (result != null && result.resumo_5405 != "S")
+                    if (result != null && getTipoEntradaSaida(FileName) == "E")
                     {
-                        ImportacaoAsync.StaticLsErrosImportacao.Add(new ErrosImportacao("W", FileName, "", "", "", 0, "Processar Primeiro CFOP 5404"));
+                        ImportacaoAsync.StaticLsErrosImportacao.Add(new ErrosImportacao("W", FileName, "", "", "", 0, "Arquivo Duplicado -CABEÇALHO!"));
+                    }
+                    if (result != null && getTipoEntradaSaida(FileName) == "S" && result.resumo_5405 == "N")
+                    {
+                        ImportacaoAsync.StaticLsErrosImportacao.Add(new ErrosImportacao("W", FileName, "", "", "", 0, "ESte Arquivo Não Passou Pelo Resumo!"));
                     }
                 }
 

@@ -216,10 +216,9 @@ namespace Trade_GP
             // 
             this.cbSelic.FormattingEnabled = true;
             this.cbSelic.Items.AddRange(new object[] {
-            "11/2024",
-            "12/2024",
             "01/2025",
-            "02/2025"});
+            "02/2025",
+            "03/2025"});
             this.cbSelic.Location = new System.Drawing.Point(253, 119);
             this.cbSelic.Margin = new System.Windows.Forms.Padding(4);
             this.cbSelic.Name = "cbSelic";

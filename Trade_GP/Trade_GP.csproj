@@ -150,6 +150,12 @@
     <Compile Include="FormImplantacaoSaldo.Designer.cs">
       <DependentUpon>FormImplantacaoSaldo.cs</DependentUpon>
     </Compile>
+    <Compile Include="FormRelatorioAnalitico.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormRelatorioAnalitico.Designer.cs">
+      <DependentUpon>FormRelatorioAnalitico.cs</DependentUpon>
+    </Compile>
     <Compile Include="FormSaldosLote.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -252,6 +258,12 @@
     <Compile Include="FormVlrEconomico.Designer.cs">
       <DependentUpon>FormVlrEconomico.cs</DependentUpon>
     </Compile>
+    <Compile Include="manutencao.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="manutencao.Designer.cs">
+      <DependentUpon>manutencao.cs</DependentUpon>
+    </Compile>
     <Compile Include="MDISingleton.cs" />
     <Compile Include="Models\AssinaturaModel.cs" />
     <Compile Include="Models\Cliente.cs" />
@@ -296,6 +308,9 @@
     <Compile Include="Util\Validacoes.cs" />
     <EmbeddedResource Include="FormImplantacaoSaldo.resx">
       <DependentUpon>FormImplantacaoSaldo.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FormRelatorioAnalitico.resx">
+      <DependentUpon>FormRelatorioAnalitico.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="FormSaldosLote.resx">
       <DependentUpon>FormSaldosLote.cs</DependentUpon>
@@ -344,6 +359,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="FormVlrEconomico.resx">
       <DependentUpon>FormVlrEconomico.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="manutencao.resx">
+      <DependentUpon>manutencao.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

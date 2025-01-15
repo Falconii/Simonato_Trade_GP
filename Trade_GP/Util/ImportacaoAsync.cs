@@ -43,6 +43,7 @@ namespace Trade_GP.Util
         public static List<Resumo_5405_01> materiais = new List<Resumo_5405_01>();
 
 
+
         /*
         public static List<string> cnpjsFabricas = new List<string> {
                     "08415791000122",
@@ -80,6 +81,8 @@ namespace Trade_GP.Util
             Boolean loadMaterais = false;
 
             Resumo_5405_01 material = new Resumo_5405_01();
+
+            Boolean existe5405 = false;
 
             await Task.Run(async () =>
             {
@@ -129,53 +132,17 @@ namespace Trade_GP.Util
                                 fields[0] = fields[0].Replace("\"","");
 
                                 fields[1] = Regex.Replace(fields[1], "[A-Za-z]", "0");
-
-                                DateTime dt_ref;
-
-                                if (fields[12].Trim() == "")
-                                {
-
-                                    ContadorLinhas++;
-
-                                    continue;
-
-                                }
-                                if ("123".Contains(fields[12].Substring(0, 1)))
-                                {
-                                    if (!DateTime.TryParseExact(fields[11], "dd/MM/yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out dt_ref))
-                                    {
-                                        ContadorLinhas++;
-
-                                        continue;
-                                    }
-                                }
-                                else if ("567".Contains(fields[12].Substring(0, 1)))
-                                {
-                                    if (!DateTime.TryParseExact(fields[10], "dd/MM/yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out dt_ref))
-                                    {
-                                        ContadorLinhas++;
-
-                                        Console.WriteLine(line);
-
-                                        continue;
-                                    }
-                                }
-                                else
-                                {
-
-                                    ImportacaoAsync.StaticLsErrosImportacao.Add(new ErrosImportacao("E", fileName, ContadorLinhas.ToString(), "CPOP", fields[12] , 0, "Excesso De Erros No Arquivo"));
-
-                                    ContadorLinhas++;
-
-                                    continue;
-                                }
-
                                 if (!loadMaterais)
                                 {
                                     try
                                     {
                                         daoResumo5405 daoMaterais = new daoResumo5405();
-                                        materiais = daoMaterais.getAll(1, fields[0], fields[1]);
+                                        int contador = await daoMaterais.existe5405(1, fields[0]);
+                                        if (contador > 0)
+                                        {
+                                            existe5405 = true;
+                                        }
+                                        materiais =  daoMaterais.getAll(1, fields[0], fields[1]);
                                         loadMaterais = true;
                                     }
                                     catch (Exception ex)
@@ -204,14 +171,63 @@ namespace Trade_GP.Util
                                     $"Erro na execução: {ex.Message}"
                                 ));
                             }
-                        
-                            if (filtroCfop == "TODAS" && materiais.Count() == 0)
+
+
+
+                            if (filtroCfop == "TODAS" && !existe5405)
                             {
+
                                 ImportacaoAsync.StaticLsErrosImportacao.Add(new ErrosImportacao("E", fileName, "", "", "", 0, "Para Esta Operação Preciso Do Resumo De Materais!"));
 
                                 break;
                             }
 
+                            if (filtroCfop == "TODAS" && materiais.Count() == 0)
+                            {
+                                return;
+                            }
+
+
+
+                            DateTime dt_ref;
+
+                            if (fields[12].Trim() == "")
+                            {
+
+                                ContadorLinhas++;
+
+                                continue;
+
+                            }
+                            if ("123".Contains(fields[12].Substring(0, 1)))
+                            {
+                                if (!DateTime.TryParseExact(fields[11], "dd/MM/yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out dt_ref))
+                                {
+                                    ContadorLinhas++;
+
+                                    continue;
+                                }
+                            }
+                            else if ("567".Contains(fields[12].Substring(0, 1)))
+                            {
+                                if (!DateTime.TryParseExact(fields[10], "dd/MM/yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out dt_ref))
+                                {
+                                    ContadorLinhas++;
+
+                                    Console.WriteLine(line);
+
+                                    continue;
+                                }
+                            }
+                            else
+                            {
+
+                                ImportacaoAsync.StaticLsErrosImportacao.Add(new ErrosImportacao("E", fileName, ContadorLinhas.ToString(), "CPOP", fields[12], 0, "Excesso De Erros No Arquivo"));
+
+                                ContadorLinhas++;
+
+                                continue;
+                            }
 
                             if (cod_emp != fields[0] || local != fields[1])
                             {

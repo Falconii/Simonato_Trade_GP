@@ -262,5 +262,25 @@ namespace Trade_GP
 
             form.Show();
         }
+
+        private void manuteçãoToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var form = new manutencao();
+
+            form.ShowDialog();
+        }
+
+        private void analíticoToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var form = new FormRelatorioAnalitico();
+
+            ((System.Windows.Forms.ToolStripMenuItem)sender).Enabled = false;
+
+            form.MdiParent = this;
+
+            form.menu = (ToolStripMenuItem)sender;
+
+            form.Show();
+        }
     }
 }

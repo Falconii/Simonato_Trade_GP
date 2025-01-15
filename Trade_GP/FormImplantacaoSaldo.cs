@@ -221,7 +221,15 @@ namespace Trade_GP
                 lsTarefas.Add(obj);
             }
  
-            LoadDbGridLog();
+            try
+            {
+
+                LoadDbGridLog();
+
+            } catch(Exception e)
+            {
+                MessageBox.Show(e.Message);
+            }
 
             return lsTarefas.Count();
         }
@@ -251,6 +259,8 @@ namespace Trade_GP
 
             if ((int)btProcessar.Tag == 0) // Processamento
             {
+                DateTime tempoInicial = DateTime.Now;
+
                 Cancelar = false;
                 
                 status_processando();
@@ -307,11 +317,21 @@ namespace Trade_GP
                         break;
                     }
 
+                    await pausaAsync();
+
                 }
 
                 status_processado();
 
-                MessageBox.Show("Fim Do Processamento!", "Atenção!");
+
+                DateTime tempoFinal = DateTime.Now;
+
+                TimeSpan tempo = (TimeSpan)(tempoFinal - tempoInicial);
+
+                string tempoDecorrido = String.Format("{0:00}:{1:00}:{2:00}", tempo.Hours, tempo.Minutes, tempo.Seconds);
+
+                MessageBox.Show($"Tempo Decorrido Total : {tempoDecorrido}");
+
 
                 return;
             }
@@ -379,6 +399,7 @@ namespace Trade_GP
                 {
                     MessageBox.Show($"Erro: {ex.Message}");
                 }
+
                 tar.Final = DateTime.Now;
 
                 TimeSpan tempo = (TimeSpan)(tar.Final - tar.Inicial);
@@ -395,12 +416,12 @@ namespace Trade_GP
                 }
                 if (i > 0)
                 {
-                    /*
+                   
                     dtGridLog.InvalidateCell(2, i-1);
                     dtGridLog.InvalidateCell(3, i-1);
                     dtGridLog.InvalidateCell(4, i-1);
                     dtGridLog.InvalidateCell(5, i-1);
-                    */
+                    
                 }
 
                 if (Cancelar) break;
@@ -418,7 +439,7 @@ namespace Trade_GP
 
             i = lsTarefas.Count;
 
-            lblProcesso.Text = $"Processando Mês {i}/{lsTarefas.Count}";
+            lblProcesso.Text = $"Processando Lote {i}/{lsTarefas.Count}";
 
             return 1;
         }
@@ -504,7 +525,16 @@ namespace Trade_GP
             }
         }
 
-         
+         private async Task<int> pausaAsync()
+        {
+
+            await Task.Run(async delegate
+            {
+                await Task.Delay(300);
+            });
+
+            return 1;
+        }
     }
 
 }

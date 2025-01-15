@@ -401,6 +401,7 @@ CREATE TABLE public.saldo_inicial  (
     cod_emp          varchar(6) NOT NULL, 
     local            varchar(6) NOT NULL,
 	material         char(15) NOT NULL,
+    unid             char(5) NOT NULL,
     descricao        varchar(100)  NOT NULL,
 	saldo_inicial    numeric(15,4) NOT NULL ,
     saldo_ini_conv   numeric(15,4) NOT NULL ,
@@ -408,7 +409,7 @@ CREATE TABLE public.saldo_inicial  (
     fator            numeric(06,2) NOT NULL ,
     ct               int4 NOT NULL,
     status           char(1) NOT NULL,
-	PRIMARY KEY(id_grupo,cod_emp,local,material)
+	PRIMARY KEY(id_grupo,cod_emp,local,material,unid)
 )
 WITHOUT OIDS 
 TABLESPACE "Producao"

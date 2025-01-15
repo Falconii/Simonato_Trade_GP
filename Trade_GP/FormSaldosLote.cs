@@ -440,7 +440,7 @@ namespace Trade_GP
                 try
                 {
 
-                   _saida = _saida = await daoDet.Saldosv2(UsuarioSistema.Id_Grupo, cod_emp, local, Periodo);
+                   _saida = _saida = await daoDet.Saldosv2X(UsuarioSistema.Id_Grupo, cod_emp, local, Periodo);
 
                 }
                 catch (Exception ex)

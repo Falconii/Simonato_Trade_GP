@@ -39,7 +39,7 @@
     BEGIN
     
         
-        RAISE NOTICE 'seek_in_2v1';
+        /*RAISE NOTICE 'seek_in_2v1';*/
 
 
         _saldo_f := _saldo_s;
@@ -238,7 +238,7 @@
 CREATE OR REPLACE FUNCTION public.seek_saida_2(_id_grupo integer, _cod_empresa text, _local text, _id_d integer, _nro_linha_d integer, _material_d text, _qtd_d numeric, _dt_ref_d date, _id_s integer, _nro_linha_s integer, _id_fechamento integer, OUT _saldo_f numeric)
  RETURNS numeric
  LANGUAGE plpgsql
- AS $function$
+ AS $$
     DECLARE
 
     controle  public.controle_e%ROWTYPE;
@@ -289,7 +289,7 @@ CREATE OR REPLACE FUNCTION public.seek_saida_2(_id_grupo integer, _cod_empresa t
             VALUES(_id_grupo,_id_fechamento,_id_s, _nro_linha_s,_id_d , _nro_linha_d, 0, 0 , _qtd_d, 'D');
       
     END;
-    $function$
+    $$
     ;
 
 
@@ -305,7 +305,7 @@ CREATE OR REPLACE FUNCTION public.calculo_saldov2(
         LANGUAGE 'plpgsql'
         COST 100
         VOLATILE PARALLEL UNSAFE
-    AS $BODY$
+    AS $$
     DECLARE
 
     tempo    fields_entrada%ROWTYPE;
@@ -403,7 +403,7 @@ CREATE OR REPLACE FUNCTION public.calculo_saldov2(
     
 
     END;
-    $BODY$;
+    $$;
 
 
    DROP TYPE IF EXISTS Reg_Saldo;
@@ -423,7 +423,7 @@ CREATE OR REPLACE FUNCTION public.calculo_saldov2(
 CREATE OR REPLACE FUNCTION public.seek_entrada_saldo(in _id_grupo integer, in _cod_empresa text, in _local text, in _material text, in _oficial text, in _saldo_s numeric, in _id_fechamento integer, OUT _saldo_f numeric)
  RETURNS numeric
  LANGUAGE plpgsql
-AS $function$
+AS $$
     DECLARE
 
     entrada  public.nfe_det_trade%ROWTYPE;
@@ -487,7 +487,7 @@ AS $function$
         END LOOP;
 
     END;
-    $function$
+    $$
 ;
 
  DROP FUNCTION IF EXISTS calculo_saldo_inicial;
@@ -502,7 +502,7 @@ CREATE OR REPLACE FUNCTION "public"."calculo_saldo_inicial" (in _id_grupo int4, 
     BEGIN
        _saida = 0;
       FOR tempo in  
-          SELECT    sld.id_grupo         as id_grupo,
+          SELECT    DISTINCT sld.id_grupo         as id_grupo,
                     sld.cod_emp          as cod_emp,
                     sld.local            as local,
                     sld.material         as material,
@@ -510,16 +510,17 @@ CREATE OR REPLACE FUNCTION "public"."calculo_saldo_inicial" (in _id_grupo int4, 
                     sld.saldo_imp_conv   as saldo_imp_conv ,
                     coalesce(depara.para_material,'') as alternativo
           FROM   saldo_inicial SLD
-          INNER JOIN resumo_5405 resumo on resumo.id_grupo = sld.id_grupo and resumo.cod_emp = sld.cod_emp and resumo.local = sld.local and resumo.material = sld.material
+          INNER JOIN resumo_5405 resumo on resumo.id_grupo = sld.id_grupo and resumo.cod_emp = sld.cod_emp and resumo.local = sld.local and resumo.material = sld.material  and resumo.dt_ref <= '2017/08/31'
           LEFT  JOIN de_para     depara on depara.id_grupo = sld.id_grupo and depara.cod_emp = sld.cod_emp and depara.local = sld.local and depara.de_material = sld.material
-          WHERE  SLD.id_grupo = _id_grupo and SLD.cod_emp = _cod_emp and SLD.local = _local and SLD.status = '0' 
+          WHERE  SLD.id_grupo = _id_grupo and SLD.cod_emp = _cod_emp and SLD.local = _local and  saldo_inicial > 0 and SLD.status = '0' 
           ORDER BY SLD.id_grupo,SLD.cod_emp,SLD.local,SLD.material limit 300
 
           LOOP      
           
-                 /*RAISE NOTICE 'Cheguei Aqui!! reg % ', tempo;*/
+                 
                  _status = '0';
              
+                 /* RAISE NOTICE 'Vou Procurar Material Principal reg % ', tempo; */
                  select _saldo_f from seek_entrada_saldo(tempo.id_grupo,tempo.cod_emp,tempo.local,tempo.material,tempo.material,tempo.saldo_ini_conv,_id_fechamento) into __saldo_f ;
             
                  if (__saldo_f = 0) then
@@ -531,7 +532,8 @@ CREATE OR REPLACE FUNCTION "public"."calculo_saldo_inicial" (in _id_grupo int4, 
                        _status := '2';
                      end if;
                  end if;
-         
+                 
+                 /* RAISE NOTICE 'Vou Procurar Material ALTERNATIVO __saldo_f % alternativo  ', __saldo_f, tempo.alternativo ; */
                  if ((__saldo_f > 0) and (tempo.alternativo != '')) then
                  
                      select _saldo_f from seek_entrada_saldo(tempo.id_grupo,tempo.cod_emp,tempo.local,tempo.alternativo,tempo.material,__saldo_f,_id_fechamento) into __saldo_f ;
@@ -547,7 +549,7 @@ CREATE OR REPLACE FUNCTION "public"."calculo_saldo_inicial" (in _id_grupo int4, 
                  end if;
          
                  update saldo_inicial set status = _status, saldo_imp_conv = saldo_ini_conv - __saldo_f  where id_grupo = tempo.id_grupo and cod_emp = tempo.cod_emp and local = tempo.local and material = tempo.material;
-             
+                 
                  _saida := _saida + 1;
 
           END LOOP;
@@ -2104,6 +2106,23 @@ CREATE OR REPLACE FUNCTION "public"."importa_sld_excel"(
        end if;
        
        _saida = 1;
+       
+    END;
+    $$
+    LANGUAGE 'plpgsql'
+    go
+
+CREATE OR REPLACE FUNCTION public.reindex( OUT _ok INT4)
+    RETURNS int4
+    AS
+    $$
+    DECLARE
+    
+    BEGIN
+    
+        _ok = 0;
+
+        EXECUTE 'REINDEX TABLE NFE_DET_TRADE';
        
     END;
     $$

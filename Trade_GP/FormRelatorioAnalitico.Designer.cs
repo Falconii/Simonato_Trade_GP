@@ -1,7 +1,7 @@
 ﻿
 namespace Trade_GP
 {
-    partial class FormImplacaoSaldo
+    partial class FormRelatorioAnalitico
     {
         /// <summary>
         /// Required designer variable.
@@ -40,9 +40,9 @@ namespace Trade_GP
             this.btParametros = new System.Windows.Forms.Button();
             this.btProximo = new System.Windows.Forms.Button();
             this.btExcel = new System.Windows.Forms.Button();
+            this.lblCancelamentoAtivado = new System.Windows.Forms.Label();
             this.lbTituloErros = new System.Windows.Forms.Label();
             this.dtGridLog = new System.Windows.Forms.DataGridView();
-            this.lblCancelamentoAtivado = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.dbLocais)).BeginInit();
             this.gbMensaProcessamento.SuspendLayout();
             this.gbParametros.SuspendLayout();
@@ -55,23 +55,24 @@ namespace Trade_GP
             | System.Windows.Forms.AnchorStyles.Right)));
             this.lblTitulo.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblTitulo.ForeColor = System.Drawing.Color.Blue;
-            this.lblTitulo.Location = new System.Drawing.Point(2, 2);
+            this.lblTitulo.Location = new System.Drawing.Point(1, 9);
             this.lblTitulo.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lblTitulo.Name = "lblTitulo";
-            this.lblTitulo.Size = new System.Drawing.Size(1767, 28);
-            this.lblTitulo.TabIndex = 57;
-            this.lblTitulo.Text = "Implantação de Saldos";
+            this.lblTitulo.Size = new System.Drawing.Size(1766, 28);
+            this.lblTitulo.TabIndex = 58;
+            this.lblTitulo.Text = "Relatórios Analticos";
             this.lblTitulo.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.lblTitulo.Click += new System.EventHandler(this.lblTitulo_Click);
             // 
             // dbLocais
             // 
             this.dbLocais.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dbLocais.Location = new System.Drawing.Point(302, 37);
+            this.dbLocais.Location = new System.Drawing.Point(300, 53);
             this.dbLocais.Margin = new System.Windows.Forms.Padding(4);
             this.dbLocais.Name = "dbLocais";
             this.dbLocais.RowHeadersWidth = 51;
             this.dbLocais.Size = new System.Drawing.Size(903, 154);
-            this.dbLocais.TabIndex = 56;
+            this.dbLocais.TabIndex = 61;
             // 
             // gbMensaProcessamento
             // 
@@ -82,12 +83,12 @@ namespace Trade_GP
             this.gbMensaProcessamento.Controls.Add(this.lblProcesso);
             this.gbMensaProcessamento.Controls.Add(this.pgProcesso);
             this.gbMensaProcessamento.Controls.Add(this.btProcessar);
-            this.gbMensaProcessamento.Location = new System.Drawing.Point(1213, 40);
+            this.gbMensaProcessamento.Location = new System.Drawing.Point(1211, 56);
             this.gbMensaProcessamento.Margin = new System.Windows.Forms.Padding(4);
             this.gbMensaProcessamento.Name = "gbMensaProcessamento";
             this.gbMensaProcessamento.Padding = new System.Windows.Forms.Padding(4);
             this.gbMensaProcessamento.Size = new System.Drawing.Size(556, 151);
-            this.gbMensaProcessamento.TabIndex = 55;
+            this.gbMensaProcessamento.TabIndex = 60;
             this.gbMensaProcessamento.TabStop = false;
             this.gbMensaProcessamento.Text = "Atenção";
             // 
@@ -129,19 +130,18 @@ namespace Trade_GP
             this.btProcessar.Tag = "0";
             this.btProcessar.Text = "Processamento";
             this.btProcessar.UseVisualStyleBackColor = true;
-            this.btProcessar.Click += new System.EventHandler(this.btProcessar_Click);
             // 
             // gbParametros
             // 
             this.gbParametros.BackColor = System.Drawing.SystemColors.ControlLight;
             this.gbParametros.Controls.Add(this.btParametros);
             this.gbParametros.Controls.Add(this.btProximo);
-            this.gbParametros.Location = new System.Drawing.Point(7, 37);
+            this.gbParametros.Location = new System.Drawing.Point(5, 53);
             this.gbParametros.Margin = new System.Windows.Forms.Padding(4);
             this.gbParametros.Name = "gbParametros";
             this.gbParametros.Padding = new System.Windows.Forms.Padding(4);
             this.gbParametros.Size = new System.Drawing.Size(287, 151);
-            this.gbParametros.TabIndex = 54;
+            this.gbParametros.TabIndex = 59;
             this.gbParametros.TabStop = false;
             this.gbParametros.Text = "Parâmetros";
             // 
@@ -155,7 +155,6 @@ namespace Trade_GP
             this.btParametros.TabIndex = 7;
             this.btParametros.Text = "PARÂMETROS";
             this.btParametros.UseVisualStyleBackColor = false;
-            this.btParametros.Click += new System.EventHandler(this.btParametros_Click);
             // 
             // btProximo
             // 
@@ -167,27 +166,38 @@ namespace Trade_GP
             this.btProximo.TabIndex = 6;
             this.btProximo.Text = "Próximo";
             this.btProximo.UseVisualStyleBackColor = true;
-            this.btProximo.Click += new System.EventHandler(this.btProximo_Click);
             // 
             // btExcel
             // 
             this.btExcel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.btExcel.Image = global::Trade_GP.Properties.Resources.excel_logo;
-            this.btExcel.Location = new System.Drawing.Point(1709, 209);
+            this.btExcel.Location = new System.Drawing.Point(1709, 239);
             this.btExcel.Margin = new System.Windows.Forms.Padding(4);
             this.btExcel.Name = "btExcel";
             this.btExcel.Size = new System.Drawing.Size(60, 48);
-            this.btExcel.TabIndex = 60;
+            this.btExcel.TabIndex = 62;
             this.btExcel.UseVisualStyleBackColor = true;
+            // 
+            // lblCancelamentoAtivado
+            // 
+            this.lblCancelamentoAtivado.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblCancelamentoAtivado.ForeColor = System.Drawing.Color.Red;
+            this.lblCancelamentoAtivado.Location = new System.Drawing.Point(0, 259);
+            this.lblCancelamentoAtivado.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.lblCancelamentoAtivado.Name = "lblCancelamentoAtivado";
+            this.lblCancelamentoAtivado.Size = new System.Drawing.Size(1729, 28);
+            this.lblCancelamentoAtivado.TabIndex = 63;
+            this.lblCancelamentoAtivado.Text = "CANCELAMENTO SOLICITADO!";
+            this.lblCancelamentoAtivado.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // lbTituloErros
             // 
             this.lbTituloErros.AutoSize = true;
-            this.lbTituloErros.Location = new System.Drawing.Point(3, 236);
+            this.lbTituloErros.Location = new System.Drawing.Point(13, 259);
             this.lbTituloErros.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lbTituloErros.Name = "lbTituloErros";
             this.lbTituloErros.Size = new System.Drawing.Size(176, 17);
-            this.lbTituloErros.TabIndex = 59;
+            this.lbTituloErros.TabIndex = 64;
             this.lbTituloErros.Text = "O que está em andamento";
             // 
             // dtGridLog
@@ -197,43 +207,31 @@ namespace Trade_GP
             | System.Windows.Forms.AnchorStyles.Right)));
             this.dtGridLog.CausesValidation = false;
             this.dtGridLog.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dtGridLog.Location = new System.Drawing.Point(5, 265);
+            this.dtGridLog.Location = new System.Drawing.Point(8, 291);
             this.dtGridLog.Margin = new System.Windows.Forms.Padding(4);
             this.dtGridLog.Name = "dtGridLog";
             this.dtGridLog.RowHeadersWidth = 51;
-            this.dtGridLog.Size = new System.Drawing.Size(1761, 420);
-            this.dtGridLog.TabIndex = 58;
+            this.dtGridLog.Size = new System.Drawing.Size(1761, 467);
+            this.dtGridLog.TabIndex = 65;
             // 
-            // lblCancelamentoAtivado
-            // 
-            this.lblCancelamentoAtivado.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblCancelamentoAtivado.ForeColor = System.Drawing.Color.Red;
-            this.lblCancelamentoAtivado.Location = new System.Drawing.Point(0, 229);
-            this.lblCancelamentoAtivado.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.lblCancelamentoAtivado.Name = "lblCancelamentoAtivado";
-            this.lblCancelamentoAtivado.Size = new System.Drawing.Size(1729, 28);
-            this.lblCancelamentoAtivado.TabIndex = 61;
-            this.lblCancelamentoAtivado.Text = "CANCELAMENTO SOLICITADO!";
-            this.lblCancelamentoAtivado.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
-            // FormImplacaoSaldo
+            // FormRelatorioAnalitico
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1780, 698);
-            this.Controls.Add(this.btExcel);
-            this.Controls.Add(this.lbTituloErros);
             this.Controls.Add(this.dtGridLog);
+            this.Controls.Add(this.lbTituloErros);
+            this.Controls.Add(this.btExcel);
             this.Controls.Add(this.lblCancelamentoAtivado);
-            this.Controls.Add(this.lblTitulo);
             this.Controls.Add(this.dbLocais);
             this.Controls.Add(this.gbMensaProcessamento);
             this.Controls.Add(this.gbParametros);
-            this.Name = "FormImplacaoSaldo";
-            this.Text = "Implantação De Saldo";
-            this.Activated += new System.EventHandler(this.FormImplacaoSaldo_Activated);
-            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.FormImplacaoSaldo_FormClosed);
-            this.Load += new System.EventHandler(this.FormImplacaoSaldo_Load);
+            this.Controls.Add(this.lblTitulo);
+            this.Name = "FormRelatorioAnalitico";
+            this.Text = "FormRelatorioAnalitico";
+            this.Activated += new System.EventHandler(this.FormRelatorioAnalitico_Activated);
+            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.FormRelatorioAnalitico_FormClosed);
+            this.Load += new System.EventHandler(this.FormRelatorioAnalitico_Load);
             ((System.ComponentModel.ISupportInitialize)(this.dbLocais)).EndInit();
             this.gbMensaProcessamento.ResumeLayout(false);
             this.gbMensaProcessamento.PerformLayout();
@@ -257,8 +255,8 @@ namespace Trade_GP
         private System.Windows.Forms.Button btParametros;
         private System.Windows.Forms.Button btProximo;
         private System.Windows.Forms.Button btExcel;
+        private System.Windows.Forms.Label lblCancelamentoAtivado;
         private System.Windows.Forms.Label lbTituloErros;
         private System.Windows.Forms.DataGridView dtGridLog;
-        private System.Windows.Forms.Label lblCancelamentoAtivado;
     }
 }

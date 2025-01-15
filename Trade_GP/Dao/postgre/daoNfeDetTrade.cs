@@ -8,6 +8,15 @@ namespace Trade_GP.Dao.postgre
 {
     class daoNfeDetTrade
     {
+        private async Task<int> calculo_saldoAsync(NpgsqlConnection conn,string strSql)
+        {
+            // Sua lógica para calcular o saldo aqui.
+            // Este é apenas um exemplo fictício.
+            using (var cmd = new NpgsqlCommand(strSql, conn))
+            {
+                return (int)await cmd.ExecuteScalarAsync();
+            }
+        }
         public void Delete(NfeDetTrade obj)
         {
 
@@ -632,7 +641,46 @@ namespace Trade_GP.Dao.postgre
             return _saida;
 
         }
-        public async Task<string> Vlr_Economico(int id_grupo, string cod_emp, string local, string periodo, int ano_selic, int mes_selic)
+
+        public async Task<int> Saldosv2X(int id_grupo, string cod_emp, string local, string periodo)
+        {
+            // Defina a string de conexão. Atualize com as informações do seu banco de dados.
+            string connString = DataBase.RunCommand.connectionString;
+
+
+            String StringProc = $"select * from calculo_saldov2({id_grupo},'{cod_emp}','{local}','{periodo}', 1) ";
+
+            int _saida = 0;
+
+            using (var conn = new NpgsqlConnection(connString))
+            {
+                try
+                {
+                    // Abra a conexão
+                    await conn.OpenAsync();
+                    Console.WriteLine("Conexão aberta com sucesso!");
+
+                    // Chame a função calculo_saldo() de forma assíncrona
+                    _saida = await calculo_saldoAsync(conn, StringProc);
+
+                    Console.WriteLine("Saldo calculado: " + _saida);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("Erro ao abrir a conexão: " + ex.Message);
+                }
+                finally
+                {
+                    // Feche a conexão
+                    await conn.DisposeAsync();
+                    Console.WriteLine("Conexão fechada com sucesso!");
+                }
+            }
+
+            return _saida;
+        }
+
+    public async Task<string> Vlr_Economico(int id_grupo, string cod_emp, string local, string periodo, int ano_selic, int mes_selic)
         {
 
             string _saida = "";
